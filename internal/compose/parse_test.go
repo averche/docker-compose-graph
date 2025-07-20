@@ -1,14 +1,14 @@
 package compose
 
 import (
+	"bytes"
 	"testing"
 
-	"github.com/goccy/go-yaml"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
 
-func TestParseComposeFile(t *testing.T) {
+func TestParseFile(t *testing.T) {
 	yamlData := `
 version: "3.9"
 
@@ -43,8 +43,7 @@ services:
         target: /data
 `
 
-	var parsed Parsed
-	err := yaml.Unmarshal([]byte(yamlData), &parsed)
+	parsed, err := Parse(bytes.NewReader([]byte(yamlData)))
 	require.NoError(t, err)
 	require.Len(t, parsed.Services, 3)
 	assert.Equal(t, "3.9", parsed.Version)
