@@ -9,58 +9,94 @@ import (
 )
 
 func TestParseFile(t *testing.T) {
-	yamlData := `
+	dockerComposeYaml := `
 version: "3.9"
 
 services:
 
-  nginx:
-    image: nginx:latest
-    depends_on:
-      - postgres
+  service1:
+    image: service1:latest
     volumes:
-      - nginx_data:/app:ro
-      - type: bind
-        source: /logs
-        target: /var/log/nginx
+      - type:   bind
+        source: /dir/from
+        target: /dir/to
 
-  postgres:
-    image: postgres:17.5
+  service2:
+    image: service2:latest
     depends_on:
-      kafka:
-        condition: service_started
+      - service1
     volumes:
-      - db_data:/var/lib/postgresql/data
+      - my-volume:/some/data:ro
 
-  kafka:
-    image: kafka:latest
+  service3:
+    image: service3:latest
     depends_on:
-      nginx:
+      service2:
         condition: service_healthy
     volumes:
-      - type: volume
-        source: kafka_data
-        target: /data
+      - /dir/from:/dir/to
+
+volumes:
+  my-volume:
 `
 
-	parsed, err := Parse(bytes.NewReader([]byte(yamlData)))
+	parsed, err := Parse(bytes.NewReader([]byte(dockerComposeYaml)))
 	require.NoError(t, err)
 	require.Len(t, parsed.Services, 3)
 	assert.Equal(t, "3.9", parsed.Version)
 
-	nginx := parsed.Services["nginx"]
-	require.Len(t, nginx.Volume, 2)
-	assert.Equal(t, Volume{Type: VolumeTypeVolume, Source: "nginx_data", Target: "/app", ReadOnly: true}, nginx.Volume[0])
-	assert.Equal(t, Volume{Type: VolumeTypeBind, Source: "/logs", Target: "/var/log/nginx", ReadOnly: false}, nginx.Volume[1])
-	assert.Equal(t, []Dependency{{On: "postgres", Condition: ConditionServiceStarted}}, nginx.Dependencies)
+	service1, ok := parsed.Services["service1"]
+	require.True(t, ok, "service1 missing from parsed result")
+	assert.Equal(
+		t,
+		[]Volume{{
+			Type:     VolumeTypeBind,
+			Source:   "/dir/from",
+			Target:   "/dir/to",
+			ReadOnly: false,
+		}},
+		service1.Volumes,
+	)
 
-	postgres := parsed.Services["postgres"]
-	require.Len(t, postgres.Volume, 1)
-	assert.Equal(t, Volume{Type: VolumeTypeVolume, Source: "db_data", Target: "/var/lib/postgresql/data", ReadOnly: false}, postgres.Volume[0])
-	assert.Equal(t, []Dependency{{On: "kafka", Condition: ConditionServiceStarted}}, postgres.Dependencies)
+	service2, ok := parsed.Services["service2"]
+	require.True(t, ok, "service2 missing from parsed result")
+	assert.Equal(
+		t,
+		[]Volume{{
+			Type:     VolumeTypeVolume,
+			Source:   "my-volume",
+			Target:   "/some/data",
+			ReadOnly: true,
+		}},
+		service2.Volumes,
+	)
+	assert.Equal(
+		t,
+		[]Dependency{{
+			On:        "service1",
+			Condition: ConditionServiceStarted,
+		}},
+		service2.Dependencies,
+	)
 
-	kafka := parsed.Services["kafka"]
-	require.Len(t, kafka.Volume, 1)
-	assert.Equal(t, Volume{Type: VolumeTypeVolume, Source: "kafka_data", Target: "/data", ReadOnly: false}, kafka.Volume[0])
-	assert.Equal(t, []Dependency{{On: "nginx", Condition: ConditionServiceHealthy}}, kafka.Dependencies)
+	service3, ok := parsed.Services["service3"]
+	require.True(t, ok, "service3 missing from parsed result")
+	assert.Equal(
+		t,
+		[]Volume{{
+			Type:     VolumeTypeBind,
+			Source:   "/dir/from",
+			Target:   "/dir/to",
+			ReadOnly: false,
+		}},
+		service3.Volumes,
+	)
+	assert.Equal(
+		t,
+		[]Dependency{{
+			On:        "service2",
+			Condition: ConditionServiceHealthy,
+		}},
+		service3.Dependencies,
+	)
 }

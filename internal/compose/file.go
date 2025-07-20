@@ -10,7 +10,7 @@ type File struct {
 }
 
 type Service struct {
-	Volume       []Volume
+	Volumes      []Volume
 	Dependencies []Dependency
 }
 
