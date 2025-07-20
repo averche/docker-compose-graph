@@ -1,85 +1,64 @@
 package compose
 
 import (
+	"errors"
 	"fmt"
+	"io"
+	"os"
 	"strings"
+
+	"github.com/goccy/go-yaml"
 )
 
-type Parsed struct {
-	Version  string             `yaml:"version,omitempty"`
-	Services map[string]Service `yaml:"services"`
-}
+// ParseConfigurations parses the given slice of files
+func ParseMultiple(paths []string) ([]File, error) {
+	var parsed []File
 
-type Service struct {
-	Volume       []Volume
-	Dependencies []Dependency
-}
-
-type Dependency struct {
-	On        string
-	Condition Condition
-}
-
-type Volume struct {
-	Type     VolumeType
-	Source   string
-	Target   string
-	ReadOnly bool
-}
-
-//
-// enums
-//
-
-type Condition uint8
-
-const (
-	ConditionUnknown Condition = iota
-	ConditionServiceStarted
-	ConditionServiceHealthy
-	ConditionServiceCompletedSuccessfully
-)
-
-func parseCondition(s string) (Condition, error) {
-	switch s {
-	case "", "service_started":
-		return ConditionServiceStarted, nil
-	case "service_healthy":
-		return ConditionServiceHealthy, nil
-	case "service_completed_successfully":
-		return ConditionServiceCompletedSuccessfully, nil
-	default:
-		return ConditionUnknown, fmt.Errorf("invalid condition: %s", s)
+	for _, path := range paths {
+		p, err := ParseFile(path)
+		if err != nil {
+			return nil, fmt.Errorf("could not parse %q: %w", path, err)
+		}
+		parsed = append(parsed, p)
 	}
+
+	return parsed, nil
 }
 
-type VolumeType uint8
-
-const (
-	VolumeTypeUnknown VolumeType = iota
-	VolumeTypeBind
-	VolumeTypeVolume
-	VolumeTypeTmpfs
-)
-
-func parseVolumeType(s string) (VolumeType, error) {
-	switch s {
-	case "", "volume":
-		return VolumeTypeVolume, nil
-	case "bind":
-		return VolumeTypeBind, nil
-	case "tmpfs":
-		return VolumeTypeTmpfs, nil
-	default:
-		return VolumeTypeUnknown, fmt.Errorf("invalid volume type: %s", s)
+func ParseFile(path string) (_ File, errs error) {
+	f, err := os.Open(path)
+	if err != nil {
+		return File{}, fmt.Errorf("could not open: %w", err)
 	}
+	defer func() {
+		if err = f.Close(); err != nil {
+			errs = errors.Join(errs, fmt.Errorf("could not close: %w", err))
+		}
+	}()
+
+	return Parse(f)
+}
+
+func Parse(r io.Reader) (File, error) {
+	b, err := io.ReadAll(r)
+	if err != nil {
+		return File{}, fmt.Errorf("could not read contents: %w", err)
+	}
+
+	var parsed File
+
+	if err := yaml.Unmarshal(b, &parsed); err != nil {
+		return File{}, fmt.Errorf("could not unmarshal yaml contents: %w", err)
+	}
+
+	return parsed, nil
 }
 
 //
 // helpers for parsing
 //
 
-// rawVolume supports both short & long formats
+// rawVolume supports both short & long 'volume' formats
 type rawVolume struct {
 	Short string
 	Long  *rawVolumeLong
@@ -110,8 +89,8 @@ func (r *rawVolume) UnmarshalYAML(unmarshal func(any) error) error {
 
 // rawDependsOn supports both list and map formats
 type rawDependsOn struct {
-	Map  map[string]rawDependsOnCondition
 	List []string
+	Map  map[string]rawDependsOnCondition
 }
 
 type rawDependsOnCondition struct {
@@ -143,7 +122,7 @@ func (s *Service) UnmarshalYAML(unmarshal func(any) error) error {
 		return err
 	}
 
-	// Normalize depends_on
+	// normalize depends_on
 	for _, dependency := range raw.DependsOn.List {
 		s.Dependencies = append(s.Dependencies, Dependency{
 			On:        dependency,
@@ -162,7 +141,7 @@ func (s *Service) UnmarshalYAML(unmarshal func(any) error) error {
 		})
 	}
 
-	// Normalize volumes
+	// normalize volumes
 	for _, volume := range raw.Volumes {
 		switch {
 		case volume.Short != "":
