@@ -156,7 +156,7 @@ func (s *Service) UnmarshalYAML(unmarshal func(any) error) error {
 				t = VolumeTypeBind
 			}
 
-			s.Volume = append(s.Volume, Volume{
+			s.Volumes = append(s.Volumes, Volume{
 				Type:     t,
 				Source:   parts[0],
 				Target:   parts[1],
@@ -168,7 +168,7 @@ func (s *Service) UnmarshalYAML(unmarshal func(any) error) error {
 			if err != nil {
 				return err
 			}
-			s.Volume = append(s.Volume, Volume{
+			s.Volumes = append(s.Volumes, Volume{
 				Type:     t,
 				Source:   volume.Long.Source,
 				Target:   volume.Long.Target,
