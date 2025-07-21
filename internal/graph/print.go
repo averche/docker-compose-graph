@@ -135,10 +135,13 @@ func printDependencies(w io.Writer, name string, dependencies []compose.Dependen
 	})
 
 	for _, dependency := range dependencies {
-		if dependency.Condition == compose.ConditionServiceHealthy {
+		switch dependency.Condition {
+		case compose.ConditionServiceHealthy:
 			fmt.Fprintf(w, `  %-26s -> %-26s [arrowhead="diamond" style="bold"];`+"\n", sanitize(name), sanitize(dependency.On))
-		} else {
-			fmt.Fprintf(w, `  %-26s -> %s;`+"\n", sanitize(name), sanitize(dependency.On))
+		case compose.ConditionServiceCompletedSuccessfully:
+			fmt.Fprintf(w, `  %-26s -> %-26s [style="bold"];`+"\n", sanitize(name), sanitize(dependency.On))
+		default:
+			fmt.Fprintf(w, `  %-26s -> %-26s [style="dashed"];`+"\n", sanitize(name), sanitize(dependency.On))
 		}
 	}
 }
