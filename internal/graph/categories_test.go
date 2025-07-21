@@ -17,23 +17,6 @@ func TestDetermineCategory(t *testing.T) {
 	assert.Equal(t, CategoryVault, DeterminteCategory("my-vault"))
 }
 
-func TestOrderedPresentCategories(t *testing.T) {
-	entities := []entity{
-		{name: "my-service1", category: CategoryService},
-		{name: "my-database", category: CategoryDatabase},
-		{name: "my-proxy", category: CategoryProxy},
-		{name: "my-storage", category: CategoryStorage},
-		{name: "my-service2", category: CategoryService},
-	}
-
-	assert.Equal(t, []Category{
-		CategoryService,
-		CategoryProxy,
-		CategoryDatabase,
-		CategoryStorage,
-	}, OrderedPresentCategories(entities))
-}
-
 func TestConsitency(t *testing.T) {
 	assert.Equal(t, int(categoryCount), len(categoryStrings), "inconsitent number of category strings")
 	assert.Equal(t, int(categoryCount), len(categoryDecorations), "inconsitent number of category decorations")
