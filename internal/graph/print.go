@@ -110,7 +110,11 @@ func printDependencies(w io.Writer, name string, serviceDependencies []compose.S
 	}
 
 	for _, v := range volumeMounts {
-		fmt.Fprintf(w, `  %-36s -> %-36s [arrowhead="diamond" style="bold"];`+"\n", sanitize(name), sanitize(v.Source))
+		if v.ReadOnly {
+			fmt.Fprintf(w, `  %-36s -> %-36s [style="dashed"];`+"\n", sanitize(name), sanitize(v.Source))
+		} else {
+			fmt.Fprintf(w, `  %-36s -> %-36s [style="bold"];`+"\n", sanitize(name), sanitize(v.Source))
+		}
 	}
 }
 
