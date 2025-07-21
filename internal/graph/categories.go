@@ -12,7 +12,7 @@ const (
 	CategoryService
 	CategoryVault
 	CategoryCadence
-	CategoryFrontEnd
+	CategoryUserInterface
 	CategoryProxy
 	CategoryDatabase
 	CategoryStorage
@@ -30,7 +30,7 @@ var categoryStrings = []string{
 	"service",
 	"vault",
 	"cadence",
-	"frontend",
+	"ui",
 	"proxy",
 	"database",
 	"storage",
@@ -39,16 +39,16 @@ var categoryStrings = []string{
 }
 
 var categoryDecorations = map[Category]Decorations{
-	CategoryNone:     {styles: []Style{Rounded, Bold, Filled}, shape: Box, palette: Palette{Blue, DarkBlue, White}},
-	CategoryService:  {styles: []Style{Rounded, Bold, Filled}, shape: Box, palette: Palette{Blue, DarkBlue, White}},
-	CategoryVault:    {styles: []Style{Rounded, Bold, Filled}, shape: Record, palette: Palette{Teal, DarkTeal, White}},
-	CategoryCadence:  {styles: []Style{Rounded, Bold, Filled}, shape: Box, palette: Palette{Teal, DarkTeal, White}},
-	CategoryFrontEnd: {styles: []Style{Rounded, Bold, Filled}, shape: Record, palette: Palette{Teal, DarkTeal, White}},
-	CategoryProxy:    {styles: []Style{Rounded, Bold, Filled}, shape: Diamond, palette: Palette{Purple, DarkPurple, White}},
-	CategoryDatabase: {styles: []Style{Rounded, Bold, Filled}, shape: Cylinder, palette: Palette{Green, DarkGreen, White}},
-	CategoryStorage:  {styles: []Style{Rounded, Bold, Filled}, shape: Cylinder, palette: Palette{Red, DarkRed, White}},
-	CategoryScript:   {styles: []Style{Rounded, Bold, Filled}, shape: Hexagon, palette: Palette{Grey, DarkGrey, White}},
-	CategoryVolume:   {styles: []Style{Rounded, Bold, Filled}, shape: Cylinder, palette: Palette{Grey, DarkGrey, White}},
+	CategoryNone:          {styles: []Style{Rounded, Bold, Filled}, shape: Box, palette: Palette{Blue, DarkBlue, White}},
+	CategoryService:       {styles: []Style{Rounded, Bold, Filled}, shape: Box, palette: Palette{Blue, DarkBlue, White}},
+	CategoryVault:         {styles: []Style{Rounded, Bold, Filled}, shape: Record, palette: Palette{Teal, DarkTeal, White}},
+	CategoryCadence:       {styles: []Style{Rounded, Bold, Filled}, shape: Box, palette: Palette{Teal, DarkTeal, White}},
+	CategoryUserInterface: {styles: []Style{Rounded, Bold, Filled}, shape: Record, palette: Palette{Teal, DarkTeal, White}},
+	CategoryProxy:         {styles: []Style{Rounded, Bold, Filled}, shape: Diamond, palette: Palette{Purple, DarkPurple, White}},
+	CategoryDatabase:      {styles: []Style{Rounded, Bold, Filled}, shape: Cylinder, palette: Palette{Green, DarkGreen, White}},
+	CategoryStorage:       {styles: []Style{Rounded, Bold, Filled}, shape: Cylinder, palette: Palette{Red, DarkRed, White}},
+	CategoryScript:        {styles: []Style{Rounded, Bold, Filled}, shape: Hexagon, palette: Palette{Grey, DarkGrey, White}},
+	CategoryVolume:        {styles: []Style{Rounded, Bold, Filled}, shape: Cylinder, palette: Palette{Grey, DarkGrey, White}},
 }
 
 func (d Category) String() string {
@@ -72,7 +72,7 @@ var patterns = []struct {
 	category: CategoryDatabase,
 	pattern:  regexp.MustCompile(`(?i)^.*(database|postgres)`),
 }, {
-	category: CategoryFrontEnd,
+	category: CategoryUserInterface,
 	pattern:  regexp.MustCompile(`(?i)^.*(ui)`),
 }, {
 	category: CategoryCadence,

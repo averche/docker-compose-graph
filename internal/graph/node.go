@@ -36,7 +36,7 @@ func NodesFromFile(file compose.File) []Node {
 
 		nodes = append(nodes, Node{
 			Name:                name,
-			Category:            DeterminteServiceCategory(name),
+			Category:            DeterminteServiceCategory(name, service.Labels[typeLabel]),
 			VolumeMounts:        volumeMounts,
 			ServiceDependencies: service.ServiceDependencies,
 		})

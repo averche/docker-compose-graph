@@ -8,7 +8,7 @@ import (
 
 func TestDetermineCategory(t *testing.T) {
 	assert.Equal(t, CategoryCadence, DeterminteServiceCategory("my-cadence", ""))
-	assert.Equal(t, CategoryFrontEnd, DeterminteServiceCategory("my-ui", ""))
+	assert.Equal(t, CategoryUserInterface, DeterminteServiceCategory("my-ui", ""))
 	assert.Equal(t, CategoryStorage, DeterminteServiceCategory("my-storage", ""))
 	assert.Equal(t, CategoryProxy, DeterminteServiceCategory("my-proxy", ""))
 	assert.Equal(t, CategoryDatabase, DeterminteServiceCategory("my-postgres", ""))
