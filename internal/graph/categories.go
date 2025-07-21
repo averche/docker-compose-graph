@@ -19,7 +19,19 @@ const (
 	categoryCount
 )
 
-var decorations = map[Category]Decorations{
+var categoryStrings = [...]string{
+	"none",
+	"Service",
+	"Vault",
+	"Cadence",
+	"FrontEnd",
+	"Proxy",
+	"Database",
+	"Storage",
+	"Script",
+}
+
+var categoryDecorations = map[Category]Decorations{
 	CategoryService:  {styles: []Style{Rounded, Bold, Filled}, shape: Box, palette: Palette{Blue, DarkBlue, White}},
 	CategoryVault:    {styles: []Style{Rounded, Bold, Filled}, shape: Record, palette: Palette{Teal, DarkTeal, White}},
 	CategoryCadence:  {styles: []Style{Rounded, Bold, Filled}, shape: Box, palette: Palette{Teal, DarkTeal, White}},
@@ -31,17 +43,7 @@ var decorations = map[Category]Decorations{
 }
 
 func (d Category) String() string {
-	return [...]string{
-		"none",
-		"Service",
-		"Vault",
-		"Cadence",
-		"FrontEnd",
-		"Proxy",
-		"Database",
-		"Storage",
-		"Script",
-	}[d]
+	return categoryStrings[d]
 }
 
 type entity struct {

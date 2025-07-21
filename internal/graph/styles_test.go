@@ -6,7 +6,7 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func TestJoin(t *testing.T) {
+func TestJoinStyles(t *testing.T) {
 	// edge cases
 	assert.Equal(t, "", JoinStyles(nil, "something"))
 	assert.Equal(t, "", JoinStyles([]Style{}, ","))
