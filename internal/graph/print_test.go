@@ -51,6 +51,12 @@ func TestPrintDependencies(t *testing.T) {
 			On:        "test-service-0",
 			Condition: compose.ConditionServiceCompletedSuccessfully,
 		}},
+		[]compose.VolumeMount{{
+			Type:     compose.VolumeTypeVolume,
+			Source:   "my-volume",
+			Target:   "/var/log",
+			ReadOnly: true,
+		}},
 	)
 
 	assert.Contains(
@@ -59,6 +65,7 @@ func TestPrintDependencies(t *testing.T) {
   my_service                           -> test_service_1                       [arrowhead="diamond" style="bold"];
   my_service                           -> test_service_3                       [arrowhead="diamond" style="bold"];
   my_service                           -> test_service_0                       [style="bold"];
+  my_service                           -> my_volume                            [style="dashed"];
 `,
 		b.String(),
 	)

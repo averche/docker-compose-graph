@@ -20,14 +20,14 @@ func Print(w io.Writer, groups []NodeGroup) {
 
 	for _, group := range groups {
 		printGroups(w, group, subgraphIndex)
+		subgraphIndex++
 	}
 
 	printLegend(w, groups, subgraphIndex)
 
 	for _, group := range groups {
 		for _, node := range group.Nodes {
-			printDependencies(w, node.Name, node.ServiceDependencies)
-			printVolumeMounts(w, node.Name, node.VolumeMountsVolume)
+			printDependencies(w, node.Name, node.ServiceDependencies, node.VolumeMountsVolume)
 		}
 	}
 
@@ -92,26 +92,29 @@ func printNode(w io.Writer, name string, category Category, small bool) {
 }
 
 // printDependencies prints the dependency lines formatted in dot-graph arrow (->) notation
-func printDependencies(w io.Writer, name string, dependencies []compose.ServiceDependency) {
-	for _, dependency := range dependencies {
+func printDependencies(w io.Writer, name string, serviceDependencies []compose.ServiceDependency, volumeMounts []compose.VolumeMount) {
+	for _, dependency := range serviceDependencies {
 		switch dependency.Condition {
 		case compose.ConditionServiceHealthy:
 			fmt.Fprintf(w, `  %-36s -> %-36s [arrowhead="diamond" style="bold"];`+"\n", sanitize(name), sanitize(dependency.On))
+
 		case compose.ConditionServiceCompletedSuccessfully:
 			fmt.Fprintf(w, `  %-36s -> %-36s [style="bold"];`+"\n", sanitize(name), sanitize(dependency.On))
+
 		case compose.ConditionServiceStarted:
 			fmt.Fprintf(w, `  %-36s -> %-36s [style="dashed"];`+"\n", sanitize(name), sanitize(dependency.On))
+
 		default:
 			panic(fmt.Sprintf("unexpected dependency condition %q", dependency.Condition))
-
 		}
 	}
-}
 
-// printVolumeMounts prints the dependency lines formatted in dot-graph arrow (->) notation
-func printVolumeMounts(w io.Writer, name string, volumeMounts []compose.VolumeMount) {
 	for _, v := range volumeMounts {
-		fmt.Fprintf(w, `  %-36s -> %-36s [arrowhead="diamond" style="bold"];`+"\n", sanitize(name), sanitize(v.Source))
+		if v.ReadOnly {
+			fmt.Fprintf(w, `  %-36s -> %-36s [style="dashed"];`+"\n", sanitize(name), sanitize(v.Source))
+		} else {
+			fmt.Fprintf(w, `  %-36s -> %-36s [style="bold"];`+"\n", sanitize(name), sanitize(v.Source))
+		}
 	}
 }
 
