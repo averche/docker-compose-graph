@@ -9,48 +9,63 @@ import (
 )
 
 // Print will print the given nodes as a dot-graph
-func Print(w io.Writer, nodes []Node) {
+func Print(w io.Writer, groups []NodeGroup) {
 	fmt.Fprintf(w, `digraph compose {`+"\n")
 	fmt.Fprintf(w, `  graph [fontname = "arial"];`+"\n")
 	fmt.Fprintf(w, `  node  [fontname = "arial"];`+"\n")
 	fmt.Fprintf(w, `  edge  [fontname = "arial" color = %q];`+"\n", DarkGrey)
 
-	// appended to the names of subgraph clusters
-	for _, node := range nodes {
-		printNode(w, node.name, node.category, false, false)
+	// subgraphIndex is appended to the names of subgraph clusters
+	var subgraphIndex uint32
+
+	for _, group := range groups {
+		printGroups(w, group, subgraphIndex)
 	}
 
-	printLegend(w, nodes)
+	printLegend(w, groups, subgraphIndex)
 
-	for _, node := range nodes {
-		printDependencies(w, node.name, node.serviceDependencies)
-	}
-
-	for _, node := range nodes {
-		printVolumeMounts(w, node.name, node.volumeMountsVolume)
+	for _, group := range groups {
+		for _, node := range group.Nodes {
+			printDependencies(w, node.Name, node.ServiceDependencies)
+			printVolumeMounts(w, node.Name, node.VolumeMountsVolume)
+		}
 	}
 
 	fmt.Fprintf(w, "}")
 }
 
+func printGroups(w io.Writer, group NodeGroup, subgraphIndex uint32) {
+	fmt.Fprintf(w, "  subgraph cluster_%d {\n", subgraphIndex)
+	fmt.Fprintf(w, "      label = %q\n", group.Name)
+	fmt.Fprintf(w, "      shape = %q\n", Box)
+	fmt.Fprintf(w, "      style = %q\n", JoinStyles([]Style{Rounded, Bold, Dashed}, ","))
+	fmt.Fprintf(w, "      color = %q\n", DarkGrey)
+
+	for _, node := range group.Nodes {
+		printNode(w, node.Name, node.Category, false)
+	}
+
+	fmt.Fprintf(w, "  }\n")
+}
+
 // printLegend prints a dot-graph subgraph with all the node types we encountered
-func printLegend(w io.Writer, nodes []Node) {
-	fmt.Fprintf(w, "  subgraph cluster_0 {\n")
+func printLegend(w io.Writer, groups []NodeGroup, subgraphIndex uint32) {
+	fmt.Fprintf(w, "  subgraph cluster_%d {\n", subgraphIndex)
 	fmt.Fprintf(w, "      label = %q\n", "Legend")
 	fmt.Fprintf(w, "      shape = %q\n", Box)
 	fmt.Fprintf(w, "      style = %q\n", JoinStyles([]Style{Rounded, Bold, Dashed}, ","))
 	fmt.Fprintf(w, "      color = %q\n", DarkGrey)
 
 	// ordered list of categories to achieve a reproducible output
-	for _, category := range orderedPresentCategories(nodes) {
-		printNode(w, category.String(), category, true, true)
+	for _, category := range orderedPresentCategories(groups) {
+		printNode(w, category.String(), category, true)
 	}
 
 	fmt.Fprintf(w, "  }\n")
 }
 
 // printNode prints a dot-graph formatted string in the form 'name [style decorators];'
-func printNode(w io.Writer, name string, category Category, offset, small bool) {
+func printNode(w io.Writer, name string, category Category, small bool) {
 	d, ok := categoryDecorations[category]
 	if !ok {
 		panic(fmt.Sprintf("decorations missing for '%s' category", category))
@@ -58,15 +73,9 @@ func printNode(w io.Writer, name string, category Category, offset, small bool) 
 
 	var format string
 	if small {
-		format = `[shape = %-12q style = %-24q fillcolor = %-12q color = %-12q fontcolor = %-12q fontsize = "8pt"  label = %q];`
+		format = `    %-34s [shape = %-12q style = %-24q fillcolor = %-12q color = %-12q fontcolor = %-12q fontsize = "8pt"  label = %q];` + "\n"
 	} else {
-		format = `[shape = %-12q style = %-24q fillcolor = %-12q color = %-12q fontcolor = %-12q label = %q];`
-	}
-
-	if offset {
-		format = "    %-34s " + format + "\n"
-	} else {
-		format = "  %-36s " + format + "\n"
+		format = `    %-34s [shape = %-12q style = %-24q fillcolor = %-12q color = %-12q fontcolor = %-12q label = %q];` + "\n"
 	}
 
 	fmt.Fprintf(
