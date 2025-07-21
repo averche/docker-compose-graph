@@ -47,11 +47,6 @@ func (d Category) String() string {
 	return categoryStrings[d]
 }
 
-type entity struct {
-	name     string
-	category Category
-}
-
 // patterns are evaluated sequentially
 var patterns = []struct {
 	category Category
@@ -89,24 +84,4 @@ func DeterminteCategory(thing string) Category {
 	}
 
 	return CategoryService // default
-}
-
-// OrderedPresentCategories returns an ordered list of categories that are present in the given slice
-func OrderedPresentCategories(entities []entity) []Category {
-	// bitmap intexed by category
-	var exists [categoryCount]bool
-
-	for _, e := range entities {
-		exists[int(e.category)] = true
-	}
-
-	var present []Category
-
-	for category := CategoryNone; category < categoryCount; category++ {
-		if exists[category] {
-			present = append(present, category)
-		}
-	}
-
-	return present
 }
