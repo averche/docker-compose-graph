@@ -7,14 +7,14 @@ import (
 )
 
 func TestDetermineCategory(t *testing.T) {
-	assert.Equal(t, CategoryCadence, DeterminteCategory("my-cadence"))
-	assert.Equal(t, CategoryFrontEnd, DeterminteCategory("my-ui"))
-	assert.Equal(t, CategoryStorage, DeterminteCategory("my-storage"))
-	assert.Equal(t, CategoryProxy, DeterminteCategory("my-proxy"))
-	assert.Equal(t, CategoryDatabase, DeterminteCategory("my-postgres"))
-	assert.Equal(t, CategoryDatabase, DeterminteCategory("my-database"))
-	assert.Equal(t, CategoryService, DeterminteCategory("something"))
-	assert.Equal(t, CategoryVault, DeterminteCategory("my-vault"))
+	assert.Equal(t, CategoryCadence, DeterminteServiceCategory("my-cadence"))
+	assert.Equal(t, CategoryFrontEnd, DeterminteServiceCategory("my-ui"))
+	assert.Equal(t, CategoryStorage, DeterminteServiceCategory("my-storage"))
+	assert.Equal(t, CategoryProxy, DeterminteServiceCategory("my-proxy"))
+	assert.Equal(t, CategoryDatabase, DeterminteServiceCategory("my-postgres"))
+	assert.Equal(t, CategoryDatabase, DeterminteServiceCategory("my-database"))
+	assert.Equal(t, CategoryService, DeterminteServiceCategory("something"))
+	assert.Equal(t, CategoryVault, DeterminteServiceCategory("my-vault"))
 }
 
 func TestConsitency(t *testing.T) {

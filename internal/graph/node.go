@@ -2,6 +2,7 @@ package graph
 
 import (
 	"cmp"
+	"fmt"
 	"slices"
 
 	"github.com/averche/docker-compose-graph/internal/compose"
@@ -10,7 +11,9 @@ import (
 type Node struct {
 	name                string
 	category            Category
-	volumeMounts        []compose.VolumeMount
+	volumeMountsBind    []compose.VolumeMount
+	volumeMountsTmpfs   []compose.VolumeMount
+	volumeMountsVolume  []compose.VolumeMount
 	serviceDependencies []compose.ServiceDependency
 }
 
@@ -19,10 +22,31 @@ func NodesFromFiles(files []compose.File) []Node {
 
 	for _, file := range files {
 		for name, service := range file.Services {
+			var (
+				volumeMountsBind   []compose.VolumeMount
+				volumeMountsTmpfs  []compose.VolumeMount
+				volumeMountsVolume []compose.VolumeMount
+			)
+
+			for _, v := range service.VolumeMounts {
+				switch v.Type {
+				case compose.VolumeTypeBind:
+					volumeMountsBind = append(volumeMountsBind, v)
+				case compose.VolumeTypeTmpfs:
+					volumeMountsTmpfs = append(volumeMountsTmpfs, v)
+				case compose.VolumeTypeVolume:
+					volumeMountsVolume = append(volumeMountsVolume, v)
+				default:
+					panic(fmt.Sprintf("unexpected volume mount type %s", v.Type))
+				}
+			}
+
 			nodes = append(nodes, Node{
 				name:                name,
-				category:            DeterminteCategory(name),
-				volumeMounts:        service.VolumeMounts,
+				category:            DeterminteServiceCategory(name),
+				volumeMountsBind:    volumeMountsBind,
+				volumeMountsTmpfs:   volumeMountsTmpfs,
+				volumeMountsVolume:  volumeMountsVolume,
 				serviceDependencies: service.ServiceDependencies,
 			})
 		}
