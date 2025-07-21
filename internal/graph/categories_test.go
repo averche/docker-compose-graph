@@ -33,3 +33,8 @@ func TestOrderedPresentCategories(t *testing.T) {
 		CategoryStorage,
 	}, OrderedPresentCategories(entities))
 }
+
+func TestConsitency(t *testing.T) {
+	assert.Equal(t, int(categoryCount), len(categoryStrings), "inconsitent number of category strings")
+	assert.Equal(t, int(categoryCount), len(categoryDecorations), "inconsitent number of category decorations")
+}
