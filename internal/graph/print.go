@@ -64,9 +64,9 @@ func printNode(w io.Writer, name string, category Category, offset, small bool) 
 	}
 
 	if offset {
-		format = "    %-24s " + format + "\n"
+		format = "    %-34s " + format + "\n"
 	} else {
-		format = "  %-26s " + format + "\n"
+		format = "  %-36s " + format + "\n"
 	}
 
 	fmt.Fprintf(
@@ -87,11 +87,14 @@ func printDependencies(w io.Writer, name string, dependencies []compose.ServiceD
 	for _, dependency := range dependencies {
 		switch dependency.Condition {
 		case compose.ConditionServiceHealthy:
-			fmt.Fprintf(w, `  %-26s -> %-26s [arrowhead="diamond" style="bold"];`+"\n", sanitize(name), sanitize(dependency.On))
+			fmt.Fprintf(w, `  %-36s -> %-36s [arrowhead="diamond" style="bold"];`+"\n", sanitize(name), sanitize(dependency.On))
 		case compose.ConditionServiceCompletedSuccessfully:
-			fmt.Fprintf(w, `  %-26s -> %-26s [style="bold"];`+"\n", sanitize(name), sanitize(dependency.On))
+			fmt.Fprintf(w, `  %-36s -> %-36s [style="bold"];`+"\n", sanitize(name), sanitize(dependency.On))
+		case compose.ConditionServiceStarted:
+			fmt.Fprintf(w, `  %-36s -> %-36s [style="dashed"];`+"\n", sanitize(name), sanitize(dependency.On))
 		default:
-			fmt.Fprintf(w, `  %-26s -> %-26s [style="dashed"];`+"\n", sanitize(name), sanitize(dependency.On))
+			panic(fmt.Sprintf("unexpected dependency condition %q", dependency.Condition))
+
 		}
 	}
 }
@@ -99,7 +102,7 @@ func printDependencies(w io.Writer, name string, dependencies []compose.ServiceD
 // printVolumeMounts prints the dependency lines formatted in dot-graph arrow (->) notation
 func printVolumeMounts(w io.Writer, name string, volumeMounts []compose.VolumeMount) {
 	for _, v := range volumeMounts {
-		fmt.Fprintf(w, `  %-26s -> %-26s [arrowhead="diamond" style="bold"];`+"\n", sanitize(name), sanitize(v.Source))
+		fmt.Fprintf(w, `  %-36s -> %-36s [arrowhead="diamond" style="bold"];`+"\n", sanitize(name), sanitize(v.Source))
 	}
 }
 
