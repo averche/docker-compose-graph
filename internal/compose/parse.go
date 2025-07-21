@@ -5,6 +5,7 @@ import (
 	"errors"
 	"fmt"
 	"io"
+	"maps"
 	"os"
 	"slices"
 	"strings"
@@ -84,26 +85,49 @@ type rawDependsOnCondition struct {
 	Condition string `yaml:"condition,omitempty"`
 }
 
-func (d *rawDependsOn) UnmarshalYAML(unmarshal func(any) error) error {
-	var fromMap map[string]rawDependsOnCondition
-	if err := unmarshal(&fromMap); err == nil {
-		d.Map = fromMap
+func (r *rawDependsOn) UnmarshalYAML(unmarshal func(any) error) error {
+	var fromList []string
+	if err := unmarshal(&fromList); err == nil {
+		r.List = fromList
 		return nil
 	}
 
-	var fromList []string
-	if err := unmarshal(&fromList); err == nil {
-		d.List = fromList
+	var fromMap map[string]rawDependsOnCondition
+	if err := unmarshal(&fromMap); err == nil {
+		r.Map = fromMap
 		return nil
 	}
 
 	return fmt.Errorf("invalid depends_on format")
 }
 
+// rawLabels supports both list and map formats
+type rawLabels struct {
+	List []string
+	Map  map[string]string
+}
+
+func (r *rawLabels) UnmarshalYAML(unmarshal func(any) error) error {
+	var fromList []string
+	if err := unmarshal(&fromList); err == nil {
+		r.List = fromList
+		return nil
+	}
+
+	var fromMap map[string]string
+	if err := unmarshal(&fromMap); err == nil {
+		r.Map = fromMap
+		return nil
+	}
+
+	return fmt.Errorf("invalid labels format")
+}
+
 func (s *Service) UnmarshalYAML(unmarshal func(any) error) error {
 	var raw struct {
 		VolumeMounts []rawVolumeMount `yaml:"volumes,omitempty"`
 		DependsOn    rawDependsOn     `yaml:"depends_on,omitempty"`
+		Labels       rawLabels        `yaml:"labels,omitempty"`
 	}
 	if err := unmarshal(&raw); err != nil {
 		return err
@@ -166,6 +190,21 @@ func (s *Service) UnmarshalYAML(unmarshal func(any) error) error {
 				ReadOnly: volume.Long.ReadOnly,
 			})
 		}
+	}
+
+	// normalize labels
+	s.Labels = make(map[string]string)
+
+	maps.Copy(s.Labels, raw.Labels.Map)
+
+	for _, label := range raw.Labels.List {
+		parts := strings.SplitN(label, "=", 2)
+
+		if len(parts) != 2 {
+			return fmt.Errorf("invalid label format: %s", label)
+		}
+
+		s.Labels[parts[0]] = parts[1]
 	}
 
 	return nil

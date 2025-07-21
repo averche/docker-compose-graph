@@ -16,6 +16,8 @@ services:
 
   service1:
     image: service1:latest
+    labels:
+      - "dot.graph.type=database"
     volumes:
       - type:   bind
         source: /dir/from
@@ -25,6 +27,8 @@ services:
     image: service2:latest
     depends_on:
       - service1
+    labels:
+      dot.graph.type: proxy
     volumes:
       - my-volume:/some/data:ro
 
@@ -57,6 +61,7 @@ volumes:
 		}},
 		service1.VolumeMounts,
 	)
+	assert.Equal(t, map[string]string{"dot.graph.type": "database"}, service1.Labels)
 
 	service2, ok := parsed.Services["service2"]
 	require.True(t, ok, "service2 missing from parsed result")
@@ -78,6 +83,7 @@ volumes:
 		}},
 		service2.ServiceDependencies,
 	)
+	assert.Equal(t, map[string]string{"dot.graph.type": "proxy"}, service2.Labels)
 
 	service3, ok := parsed.Services["service3"]
 	require.True(t, ok, "service3 missing from parsed result")
