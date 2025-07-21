@@ -1,6 +1,9 @@
 package graph
 
-import "regexp"
+import (
+	"regexp"
+	"slices"
+)
 
 type Category uint8
 
@@ -9,7 +12,7 @@ const (
 	CategoryService
 	CategoryVault
 	CategoryCadence
-	CategoryFrontEnd
+	CategoryUserInterface
 	CategoryProxy
 	CategoryDatabase
 	CategoryStorage
@@ -22,30 +25,30 @@ const (
 	categoryCount
 )
 
-var categoryStrings = [...]string{
+var categoryStrings = []string{
 	"none",
-	"Service",
-	"Vault",
-	"Cadence",
-	"FrontEnd",
-	"Proxy",
-	"Database",
-	"Storage",
-	"Script",
-	"Volume",
+	"service",
+	"vault",
+	"cadence",
+	"ui",
+	"proxy",
+	"database",
+	"storage",
+	"script",
+	"volume",
 }
 
 var categoryDecorations = map[Category]Decorations{
-	CategoryNone:     {styles: []Style{Rounded, Bold, Filled}, shape: Box, palette: Palette{Blue, DarkBlue, White}},
-	CategoryService:  {styles: []Style{Rounded, Bold, Filled}, shape: Box, palette: Palette{Blue, DarkBlue, White}},
-	CategoryVault:    {styles: []Style{Rounded, Bold, Filled}, shape: Record, palette: Palette{Teal, DarkTeal, White}},
-	CategoryCadence:  {styles: []Style{Rounded, Bold, Filled}, shape: Box, palette: Palette{Teal, DarkTeal, White}},
-	CategoryFrontEnd: {styles: []Style{Rounded, Bold, Filled}, shape: Record, palette: Palette{Teal, DarkTeal, White}},
-	CategoryProxy:    {styles: []Style{Rounded, Bold, Filled}, shape: Diamond, palette: Palette{Purple, DarkPurple, White}},
-	CategoryDatabase: {styles: []Style{Rounded, Bold, Filled}, shape: Cylinder, palette: Palette{Green, DarkGreen, White}},
-	CategoryStorage:  {styles: []Style{Rounded, Bold, Filled}, shape: Cylinder, palette: Palette{Red, DarkRed, White}},
-	CategoryScript:   {styles: []Style{Rounded, Bold, Filled}, shape: Hexagon, palette: Palette{Grey, DarkGrey, White}},
-	CategoryVolume:   {styles: []Style{Rounded, Bold, Filled}, shape: Cylinder, palette: Palette{Grey, DarkGrey, White}},
+	CategoryNone:          {styles: []Style{Rounded, Bold, Filled}, shape: Box, palette: Palette{Blue, DarkBlue, White}},
+	CategoryService:       {styles: []Style{Rounded, Bold, Filled}, shape: Box, palette: Palette{Blue, DarkBlue, White}},
+	CategoryVault:         {styles: []Style{Rounded, Bold, Filled}, shape: Record, palette: Palette{Teal, DarkTeal, White}},
+	CategoryCadence:       {styles: []Style{Rounded, Bold, Filled}, shape: Box, palette: Palette{Teal, DarkTeal, White}},
+	CategoryUserInterface: {styles: []Style{Rounded, Bold, Filled}, shape: Record, palette: Palette{Teal, DarkTeal, White}},
+	CategoryProxy:         {styles: []Style{Rounded, Bold, Filled}, shape: Diamond, palette: Palette{Purple, DarkPurple, White}},
+	CategoryDatabase:      {styles: []Style{Rounded, Bold, Filled}, shape: Cylinder, palette: Palette{Green, DarkGreen, White}},
+	CategoryStorage:       {styles: []Style{Rounded, Bold, Filled}, shape: Cylinder, palette: Palette{Red, DarkRed, White}},
+	CategoryScript:        {styles: []Style{Rounded, Bold, Filled}, shape: Hexagon, palette: Palette{Grey, DarkGrey, White}},
+	CategoryVolume:        {styles: []Style{Rounded, Bold, Filled}, shape: Cylinder, palette: Palette{Grey, DarkGrey, White}},
 }
 
 func (d Category) String() string {
@@ -69,7 +72,7 @@ var patterns = []struct {
 	category: CategoryDatabase,
 	pattern:  regexp.MustCompile(`(?i)^.*(database|postgres)`),
 }, {
-	category: CategoryFrontEnd,
+	category: CategoryUserInterface,
 	pattern:  regexp.MustCompile(`(?i)^.*(ui)`),
 }, {
 	category: CategoryCadence,
@@ -79,8 +82,15 @@ var patterns = []struct {
 	pattern:  regexp.MustCompile(`(?i)^.*(vault)`),
 }}
 
-// DetermineCategory tries to guess the category of the given thing based on the regex expressions above
-func DeterminteServiceCategory(service string) Category {
+// DetermineCategory tries to guess the category based on the service name & label (if provided)
+func DeterminteServiceCategory(service, label string) Category {
+	// try to find exact matches for the label first
+	if label != "" {
+		if i := slices.Index(categoryStrings, label); i != -1 {
+			return Category(i)
+		}
+	}
+
 	// test for each category in sequence
 	for _, p := range patterns {
 		if p.pattern.MatchString(service) {

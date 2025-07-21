@@ -12,6 +12,7 @@ type File struct {
 type Service struct {
 	VolumeMounts        []VolumeMount
 	ServiceDependencies []ServiceDependency
+	Labels              map[string]string
 }
 
 type ServiceDependency struct {

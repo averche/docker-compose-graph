@@ -27,7 +27,7 @@ func Print(w io.Writer, groups []NodeGroup) {
 
 	for _, group := range groups {
 		for _, node := range group.Nodes {
-			printDependencies(w, node.Name, node.ServiceDependencies, node.VolumeMountsVolume)
+			printDependencies(w, node.Name, node.ServiceDependencies, node.VolumeMounts)
 		}
 	}
 
