@@ -12,21 +12,6 @@ import (
 	"github.com/goccy/go-yaml"
 )
 
-// ParseConfigurations parses the given slice of files
-func ParseMultiple(paths []string) ([]File, error) {
-	var parsed []File
-
-	for _, path := range paths {
-		p, err := ParseFile(path)
-		if err != nil {
-			return nil, fmt.Errorf("could not parse %q: %w", path, err)
-		}
-		parsed = append(parsed, p)
-	}
-
-	return parsed, nil
-}
-
 func ParseFile(path string) (_ File, errs error) {
 	f, err := os.Open(path)
 	if err != nil {

@@ -7,18 +7,25 @@ import (
 )
 
 func TestOrderedPresentCategories(t *testing.T) {
-	nodes := []Node{
-		{name: "my-service1", category: CategoryService},
-		{name: "my-database", category: CategoryDatabase},
-		{name: "my-proxy", category: CategoryProxy},
-		{name: "my-storage", category: CategoryStorage},
-		{name: "my-service2", category: CategoryService},
-	}
+	groups := []NodeGroup{{
+		Name: "docker-compose-1.yaml",
+		Nodes: []Node{
+			{Name: "my-service1", Category: CategoryService},
+			{Name: "my-database", Category: CategoryDatabase},
+		},
+	}, {
+		Name: "docker-compose-2.yaml",
+		Nodes: []Node{
+			{Name: "my-proxy", Category: CategoryProxy},
+			{Name: "my-storage", Category: CategoryStorage},
+			{Name: "my-service2", Category: CategoryService},
+		},
+	}}
 
 	assert.Equal(t, []Category{
 		CategoryService,
 		CategoryProxy,
 		CategoryDatabase,
 		CategoryStorage,
-	}, orderedPresentCategories(nodes))
+	}, orderedPresentCategories(groups))
 }

@@ -11,18 +11,18 @@ import (
 func TestPrintNode(t *testing.T) {
 	var b1, b2, b3 strings.Builder
 
-	printNode(&b1, "my-service", CategoryService, false, true)
-	printNode(&b2, "cadence-service", CategoryCadence, false, false)
-	printNode(&b3, "my-proxy", CategoryProxy, true, true)
+	printNode(&b1, "my-service", CategoryService, true)
+	printNode(&b2, "cadence-service", CategoryCadence, false)
+	printNode(&b3, "my-proxy", CategoryProxy, true)
 
 	assert.Equal(
 		t,
-		`  my_service                           [shape = "box"        style = "rounded,bold,filled"    fillcolor = "/blues8/7"  color = "/blues8/8"  fontcolor = "white"      fontsize = "8pt"  label = "my-service"];`+"\n",
+		`    my_service                         [shape = "box"        style = "rounded,bold,filled"    fillcolor = "/blues8/7"  color = "/blues8/8"  fontcolor = "white"      fontsize = "8pt"  label = "my-service"];`+"\n",
 		b1.String(),
 	)
 	assert.Equal(
 		t,
-		`  cadence_service                      [shape = "box"        style = "rounded,bold,filled"    fillcolor = "/brbg8/7"   color = "/brbg8/8"   fontcolor = "white"      label = "cadence-service"];`+"\n",
+		`    cadence_service                    [shape = "box"        style = "rounded,bold,filled"    fillcolor = "/brbg8/7"   color = "/brbg8/8"   fontcolor = "white"      label = "cadence-service"];`+"\n",
 		b2.String(),
 	)
 	assert.Equal(
