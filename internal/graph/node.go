@@ -37,7 +37,7 @@ func NodesFromFiles(files []compose.File) []Node {
 				case compose.VolumeTypeVolume:
 					volumeMountsVolume = append(volumeMountsVolume, v)
 				default:
-					panic(fmt.Sprintf("unexpected volume mount type %s", v.Type))
+					panic(fmt.Sprintf("unexpected volume mount type %q", v.Type))
 				}
 			}
 
