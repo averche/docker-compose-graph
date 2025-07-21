@@ -72,12 +72,13 @@ func TestPrintDependencies(t *testing.T) {
 			Condition: compose.ConditionServiceCompletedSuccessfully,
 		}},
 	)
+	t.Log(b.String())
 
 	assert.Contains(
 		t, `
-  my_service                 -> test_service_0;
+  my_service                 -> test_service_0             [style="bold"];
   my_service                 -> test_service_1             [arrowhead="diamond" style="bold"];
-  my_service                 -> test_service_2;
+  my_service                 -> test_service_2             [style="dashed"];
   my_service                 -> test_service_3             [arrowhead="diamond" style="bold"];
 `,
 		b.String(),
