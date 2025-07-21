@@ -1,9 +1,10 @@
 package graph
 
 import (
+	"cmp"
 	"fmt"
 	"io"
-	"sort"
+	"slices"
 	"strings"
 
 	"github.com/averche/docker-compose-graph/internal/compose"
@@ -20,8 +21,8 @@ func Print(w io.Writer, nodes []Node) {
 	var subgraphIndex uint32
 
 	for _, node := range nodes {
-		if len(node.volumes) != 0 {
-			printNodeWithVolumes(w, node.name, node.category, subgraphIndex, node.volumes)
+		if len(node.volumeMounts) != 0 {
+			printNodeWithVolumes(w, node.name, node.category, subgraphIndex, node.volumeMounts)
 			subgraphIndex++
 		} else {
 			printNode(w, node.name, node.category, false, false)
@@ -31,7 +32,7 @@ func Print(w io.Writer, nodes []Node) {
 	printLegend(w, nodes, subgraphIndex)
 
 	for _, node := range nodes {
-		printDependencies(w, node.name, node.dependencies)
+		printDependencies(w, node.name, node.serviceDependencies)
 	}
 
 	fmt.Fprintf(w, "}")
@@ -87,7 +88,7 @@ func printNode(w io.Writer, name string, category Category, offset, small bool) 
 }
 
 // printNodeWithVolumes prints a dot-graph subgraph which includes the node and its volumes
-func printNodeWithVolumes(w io.Writer, name string, category Category, subgraphIndex uint32, volumes []compose.Volume) {
+func printNodeWithVolumes(w io.Writer, name string, category Category, subgraphIndex uint32, volumes []compose.VolumeMount) {
 	d, ok := categoryDecorations[category]
 	if !ok {
 		panic(fmt.Sprintf("decorations missing for '%s' category", category))
@@ -101,8 +102,8 @@ func printNodeWithVolumes(w io.Writer, name string, category Category, subgraphI
 	printNode(w, name, category, true, false)
 
 	// sort the volumes to achieve a reproducible output
-	sort.Slice(volumes, func(i, j int) bool {
-		return volumes[i].Source < volumes[j].Target
+	slices.SortFunc(volumes, func(a, b compose.VolumeMount) int {
+		return cmp.Compare(a.Source, b.Source)
 	})
 
 	for i, volume := range volumes {
@@ -128,10 +129,10 @@ func printNodeWithVolumes(w io.Writer, name string, category Category, subgraphI
 }
 
 // printDependencies prints the dependency lines formatted in dot-graph arrow (->) notation
-func printDependencies(w io.Writer, name string, dependencies []compose.Dependency) {
+func printDependencies(w io.Writer, name string, dependencies []compose.ServiceDependency) {
 	// sort dependencies to achieve a reproducible output
-	sort.Slice(dependencies, func(i, j int) bool {
-		return dependencies[i].On < dependencies[j].On
+	slices.SortFunc(dependencies, func(a, b compose.ServiceDependency) int {
+		return cmp.Compare(a.On, b.On)
 	})
 
 	for _, dependency := range dependencies {

@@ -43,60 +43,62 @@ volumes:
 	parsed, err := Parse(bytes.NewReader([]byte(dockerComposeYaml)))
 	require.NoError(t, err)
 	require.Len(t, parsed.Services, 3)
-	assert.Equal(t, "3.9", parsed.Version)
+	require.Len(t, parsed.Volumes, 1)
 
 	service1, ok := parsed.Services["service1"]
 	require.True(t, ok, "service1 missing from parsed result")
 	assert.Equal(
 		t,
-		[]Volume{{
+		[]VolumeMount{{
 			Type:     VolumeTypeBind,
 			Source:   "/dir/from",
 			Target:   "/dir/to",
 			ReadOnly: false,
 		}},
-		service1.Volumes,
+		service1.VolumeMounts,
 	)
 
 	service2, ok := parsed.Services["service2"]
 	require.True(t, ok, "service2 missing from parsed result")
 	assert.Equal(
 		t,
-		[]Volume{{
+		[]VolumeMount{{
 			Type:     VolumeTypeVolume,
 			Source:   "my-volume",
 			Target:   "/some/data",
 			ReadOnly: true,
 		}},
-		service2.Volumes,
+		service2.VolumeMounts,
 	)
 	assert.Equal(
 		t,
-		[]Dependency{{
+		[]ServiceDependency{{
 			On:        "service1",
 			Condition: ConditionServiceStarted,
 		}},
-		service2.Dependencies,
+		service2.ServiceDependencies,
 	)
 
 	service3, ok := parsed.Services["service3"]
 	require.True(t, ok, "service3 missing from parsed result")
 	assert.Equal(
 		t,
-		[]Volume{{
+		[]VolumeMount{{
 			Type:     VolumeTypeBind,
 			Source:   "/dir/from",
 			Target:   "/dir/to",
 			ReadOnly: false,
 		}},
-		service3.Volumes,
+		service3.VolumeMounts,
 	)
 	assert.Equal(
 		t,
-		[]Dependency{{
+		[]ServiceDependency{{
 			On:        "service2",
 			Condition: ConditionServiceHealthy,
 		}},
-		service3.Dependencies,
+		service3.ServiceDependencies,
 	)
+
+	assert.Equal(t, []string{"my-volume"}, parsed.Volumes)
 }

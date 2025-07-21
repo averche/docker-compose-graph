@@ -47,7 +47,7 @@ func TestParseCondition(t *testing.T) {
 func TestParseVolumeType(t *testing.T) {
 	tests := []struct {
 		input       string
-		expected    VolumeType
+		expected    VolumeMountType
 		expectedErr bool
 	}{{
 		input:       "",
@@ -72,7 +72,7 @@ func TestParseVolumeType(t *testing.T) {
 	}}
 
 	for _, tt := range tests {
-		got, err := parseVolumeType(tt.input)
+		got, err := parseVolumeMountType(tt.input)
 		if tt.expectedErr {
 			assert.Error(t, err)
 		} else {

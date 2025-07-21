@@ -6,6 +6,7 @@ type Category uint8
 
 const (
 	CategoryNone Category = iota
+	CategoryVolume
 	CategoryService
 	CategoryVault
 	CategoryCadence
@@ -21,6 +22,7 @@ const (
 
 var categoryStrings = [...]string{
 	"none",
+	"Volume",
 	"Service",
 	"Vault",
 	"Cadence",
@@ -33,6 +35,7 @@ var categoryStrings = [...]string{
 
 var categoryDecorations = map[Category]Decorations{
 	CategoryNone:     {styles: []Style{Rounded, Bold, Filled}, shape: Box, palette: Palette{Blue, DarkBlue, White}},
+	CategoryVolume:   {styles: []Style{Rounded, Bold, Filled}, shape: Cylinder, palette: Palette{Grey, DarkGrey, White}},
 	CategoryService:  {styles: []Style{Rounded, Bold, Filled}, shape: Box, palette: Palette{Blue, DarkBlue, White}},
 	CategoryVault:    {styles: []Style{Rounded, Bold, Filled}, shape: Record, palette: Palette{Teal, DarkTeal, White}},
 	CategoryCadence:  {styles: []Style{Rounded, Bold, Filled}, shape: Box, palette: Palette{Teal, DarkTeal, White}},

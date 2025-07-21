@@ -35,7 +35,7 @@ func TestPrintNode(t *testing.T) {
 func TestPrintNodeWithVolumes(t *testing.T) {
 	var b strings.Builder
 
-	printNodeWithVolumes(&b, "my-service", CategoryService, 5, []compose.Volume{{Source: "./my/dir/", Target: "/target/dir/"}})
+	printNodeWithVolumes(&b, "my-service", CategoryService, 5, []compose.VolumeMount{{Source: "./my/dir/", Target: "/target/dir/"}})
 
 	assert.Contains(
 		t, `
@@ -58,7 +58,7 @@ func TestPrintDependencies(t *testing.T) {
 	printDependencies(
 		&b,
 		"my-service",
-		[]compose.Dependency{{
+		[]compose.ServiceDependency{{
 			On:        "test-service-2",
 			Condition: compose.ConditionServiceStarted,
 		}, {
