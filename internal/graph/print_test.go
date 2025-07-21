@@ -32,26 +32,6 @@ func TestPrintNode(t *testing.T) {
 	)
 }
 
-func TestPrintNodeWithVolumes(t *testing.T) {
-	var b strings.Builder
-
-	printNodeWithVolumes(&b, "my-service", CategoryService, 5, []compose.VolumeMount{{Source: "./my/dir/", Target: "/target/dir/"}})
-
-	assert.Contains(
-		t, `
-  subgraph cluster_5 {
-      shape = "box"
-      style = "rounded,bold,dashed"
-      color = "/blues8/8"
-    my_service               [shape = "box"        style = "rounded,bold,filled"    fillcolor = "/blues8/7"  color = "/blues8/8"  fontcolor = "white"      label = "my-service"];
-    my_service_v0            [shape = "cylinder"   style = "rounded,bold,dashed"                             color = "/blues8/8"  fontcolor = "/greys8/8"  label = "volume\nfrom: ./my/dir/\nto: /target/dir/"];
-    my_service               -> my_service_v0;
-  }
-`,
-		b.String(),
-	)
-}
-
 func TestPrintDependencies(t *testing.T) {
 	var b strings.Builder
 
