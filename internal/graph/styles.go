@@ -54,7 +54,6 @@ type Decorations struct {
 	palette Palette
 }
 
-// strings.Join replacement for []Style
 func JoinStyles(styles []Style, sep string) string {
 	var b strings.Builder
 
