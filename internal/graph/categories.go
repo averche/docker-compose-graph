@@ -1,6 +1,9 @@
 package graph
 
-import "regexp"
+import (
+	"regexp"
+	"slices"
+)
 
 type Category uint8
 
@@ -22,17 +25,17 @@ const (
 	categoryCount
 )
 
-var categoryStrings = [...]string{
+var categoryStrings = []string{
 	"none",
-	"Service",
-	"Vault",
-	"Cadence",
-	"FrontEnd",
-	"Proxy",
-	"Database",
-	"Storage",
-	"Script",
-	"Volume",
+	"service",
+	"vault",
+	"cadence",
+	"frontend",
+	"proxy",
+	"database",
+	"storage",
+	"script",
+	"volume",
 }
 
 var categoryDecorations = map[Category]Decorations{
@@ -79,8 +82,15 @@ var patterns = []struct {
 	pattern:  regexp.MustCompile(`(?i)^.*(vault)`),
 }}
 
-// DetermineCategory tries to guess the category of the given thing based on the regex expressions above
-func DeterminteServiceCategory(service string) Category {
+// DetermineCategory tries to guess the category based on the service name & label (if provided)
+func DeterminteServiceCategory(service, label string) Category {
+	// try to find exact matches for the label first
+	if label != "" {
+		if i := slices.Index(categoryStrings, label); i != -1 {
+			return Category(i)
+		}
+	}
+
 	// test for each category in sequence
 	for _, p := range patterns {
 		if p.pattern.MatchString(service) {
