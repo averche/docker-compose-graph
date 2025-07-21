@@ -6,7 +6,6 @@ type Category uint8
 
 const (
 	CategoryNone Category = iota
-	CategoryVolume
 	CategoryService
 	CategoryVault
 	CategoryCadence
@@ -16,13 +15,15 @@ const (
 	CategoryStorage
 	CategoryScript
 
+	// this category is reserved for volumes
+	CategoryVolume
+
 	// this entry must be last
 	categoryCount
 )
 
 var categoryStrings = [...]string{
 	"none",
-	"Volume",
 	"Service",
 	"Vault",
 	"Cadence",
@@ -31,11 +32,11 @@ var categoryStrings = [...]string{
 	"Database",
 	"Storage",
 	"Script",
+	"Volume",
 }
 
 var categoryDecorations = map[Category]Decorations{
 	CategoryNone:     {styles: []Style{Rounded, Bold, Filled}, shape: Box, palette: Palette{Blue, DarkBlue, White}},
-	CategoryVolume:   {styles: []Style{Rounded, Bold, Filled}, shape: Cylinder, palette: Palette{Grey, DarkGrey, White}},
 	CategoryService:  {styles: []Style{Rounded, Bold, Filled}, shape: Box, palette: Palette{Blue, DarkBlue, White}},
 	CategoryVault:    {styles: []Style{Rounded, Bold, Filled}, shape: Record, palette: Palette{Teal, DarkTeal, White}},
 	CategoryCadence:  {styles: []Style{Rounded, Bold, Filled}, shape: Box, palette: Palette{Teal, DarkTeal, White}},
@@ -44,6 +45,7 @@ var categoryDecorations = map[Category]Decorations{
 	CategoryDatabase: {styles: []Style{Rounded, Bold, Filled}, shape: Cylinder, palette: Palette{Green, DarkGreen, White}},
 	CategoryStorage:  {styles: []Style{Rounded, Bold, Filled}, shape: Cylinder, palette: Palette{Red, DarkRed, White}},
 	CategoryScript:   {styles: []Style{Rounded, Bold, Filled}, shape: Hexagon, palette: Palette{Grey, DarkGrey, White}},
+	CategoryVolume:   {styles: []Style{Rounded, Bold, Filled}, shape: Cylinder, palette: Palette{Grey, DarkGrey, White}},
 }
 
 func (d Category) String() string {
@@ -78,10 +80,10 @@ var patterns = []struct {
 }}
 
 // DetermineCategory tries to guess the category of the given thing based on the regex expressions above
-func DeterminteCategory(thing string) Category {
+func DeterminteServiceCategory(service string) Category {
 	// test for each category in sequence
 	for _, p := range patterns {
-		if p.pattern.MatchString(thing) {
+		if p.pattern.MatchString(service) {
 			return p.category
 		}
 	}

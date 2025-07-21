@@ -1,10 +1,8 @@
 package graph
 
 import (
-	"cmp"
 	"fmt"
 	"io"
-	"slices"
 	"strings"
 
 	"github.com/averche/docker-compose-graph/internal/compose"
@@ -18,29 +16,26 @@ func Print(w io.Writer, nodes []Node) {
 	fmt.Fprintf(w, `  edge  [fontname = "arial" color = %q];`+"\n", DarkGrey)
 
 	// appended to the names of subgraph clusters
-	var subgraphIndex uint32
-
 	for _, node := range nodes {
-		if len(node.volumeMounts) != 0 {
-			printNodeWithVolumes(w, node.name, node.category, subgraphIndex, node.volumeMounts)
-			subgraphIndex++
-		} else {
-			printNode(w, node.name, node.category, false, false)
-		}
+		printNode(w, node.name, node.category, false, false)
 	}
 
-	printLegend(w, nodes, subgraphIndex)
+	printLegend(w, nodes)
 
 	for _, node := range nodes {
 		printDependencies(w, node.name, node.serviceDependencies)
+	}
+
+	for _, node := range nodes {
+		printVolumeMounts(w, node.name, node.volumeMountsVolume)
 	}
 
 	fmt.Fprintf(w, "}")
 }
 
 // printLegend prints a dot-graph subgraph with all the node types we encountered
-func printLegend(w io.Writer, nodes []Node, subgraphIndex uint32) {
-	fmt.Fprintf(w, "  subgraph cluster_%d {\n", subgraphIndex)
+func printLegend(w io.Writer, nodes []Node) {
+	fmt.Fprintf(w, "  subgraph cluster_0 {\n")
 	fmt.Fprintf(w, "      label = %q\n", "Legend")
 	fmt.Fprintf(w, "      shape = %q\n", Box)
 	fmt.Fprintf(w, "      style = %q\n", JoinStyles([]Style{Rounded, Bold, Dashed}, ","))
@@ -87,54 +82,8 @@ func printNode(w io.Writer, name string, category Category, offset, small bool) 
 	)
 }
 
-// printNodeWithVolumes prints a dot-graph subgraph which includes the node and its volumes
-func printNodeWithVolumes(w io.Writer, name string, category Category, subgraphIndex uint32, volumes []compose.VolumeMount) {
-	d, ok := categoryDecorations[category]
-	if !ok {
-		panic(fmt.Sprintf("decorations missing for '%s' category", category))
-	}
-
-	fmt.Fprintf(w, "  subgraph cluster_%d {\n", subgraphIndex)
-	fmt.Fprintf(w, "      shape = %q\n", Box)
-	fmt.Fprintf(w, "      style = %q\n", JoinStyles([]Style{Rounded, Bold, Dashed}, ","))
-	fmt.Fprintf(w, "      color = %q\n", d.palette.ColorBorder)
-
-	printNode(w, name, category, true, false)
-
-	// sort the volumes to achieve a reproducible output
-	slices.SortFunc(volumes, func(a, b compose.VolumeMount) int {
-		return cmp.Compare(a.Source, b.Source)
-	})
-
-	for i, volume := range volumes {
-		fmt.Fprintf(
-			w,
-			`    %-24s [shape = %-12q style = %-24q                          color = %-12q fontcolor = %-12q label = "volume\nfrom: %s\nto: %s"];`+"\n",
-			fmt.Sprintf("%s_v%d", sanitize(name), i),
-			Cylinder,
-			JoinStyles([]Style{Rounded, Bold, Dashed}, ","),
-			d.palette.ColorBorder,
-			DarkGrey,
-			volume.Source,
-			volume.Target,
-		)
-	}
-
-	// draw connections to each volume
-	for i := range volumes {
-		fmt.Fprintf(w, `    %-24s -> %s_v%d;`+"\n", sanitize(name), sanitize(name), i)
-	}
-
-	fmt.Fprintf(w, "  }\n")
-}
-
 // printDependencies prints the dependency lines formatted in dot-graph arrow (->) notation
 func printDependencies(w io.Writer, name string, dependencies []compose.ServiceDependency) {
-	// sort dependencies to achieve a reproducible output
-	slices.SortFunc(dependencies, func(a, b compose.ServiceDependency) int {
-		return cmp.Compare(a.On, b.On)
-	})
-
 	for _, dependency := range dependencies {
 		switch dependency.Condition {
 		case compose.ConditionServiceHealthy:
@@ -144,6 +93,13 @@ func printDependencies(w io.Writer, name string, dependencies []compose.ServiceD
 		default:
 			fmt.Fprintf(w, `  %-26s -> %-26s [style="dashed"];`+"\n", sanitize(name), sanitize(dependency.On))
 		}
+	}
+}
+
+// printVolumeMounts prints the dependency lines formatted in dot-graph arrow (->) notation
+func printVolumeMounts(w io.Writer, name string, volumeMounts []compose.VolumeMount) {
+	for _, v := range volumeMounts {
+		fmt.Fprintf(w, `  %-26s -> %-26s [arrowhead="diamond" style="bold"];`+"\n", sanitize(name), sanitize(v.Source))
 	}
 }
 
