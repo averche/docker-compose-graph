@@ -5,22 +5,22 @@ import (
 )
 
 type File struct {
-	Version  string             `yaml:"version,omitempty"`
-	Services map[string]Service `yaml:"services"`
+	Services map[string]Service
+	Volumes  []string
 }
 
 type Service struct {
-	Volumes      []Volume
-	Dependencies []Dependency
+	VolumeMounts        []VolumeMount
+	ServiceDependencies []ServiceDependency
 }
 
-type Dependency struct {
+type ServiceDependency struct {
 	On        string
 	Condition Condition
 }
 
-type Volume struct {
-	Type     VolumeType
+type VolumeMount struct {
+	Type     VolumeMountType
 	Source   string
 	Target   string
 	ReadOnly bool
@@ -54,16 +54,16 @@ func parseCondition(s string) (Condition, error) {
 	return ConditionUnknown, fmt.Errorf("invalid condition: %s", s)
 }
 
-type VolumeType uint8
+type VolumeMountType uint8
 
 const (
-	VolumeTypeUnknown VolumeType = iota
+	VolumeTypeUnknown VolumeMountType = iota
 	VolumeTypeBind
 	VolumeTypeVolume
 	VolumeTypeTmpfs
 )
 
-func parseVolumeType(s string) (VolumeType, error) {
+func parseVolumeMountType(s string) (VolumeMountType, error) {
 	switch s {
 	case "", "volume":
 		return VolumeTypeVolume, nil

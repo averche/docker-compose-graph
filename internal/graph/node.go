@@ -1,16 +1,17 @@
 package graph
 
 import (
-	"sort"
+	"cmp"
+	"slices"
 
 	"github.com/averche/docker-compose-graph/internal/compose"
 )
 
 type Node struct {
-	name         string
-	category     Category
-	volumes      []compose.Volume
-	dependencies []compose.Dependency
+	name                string
+	category            Category
+	volumeMounts        []compose.VolumeMount
+	serviceDependencies []compose.ServiceDependency
 }
 
 func NodesFromFiles(files []compose.File) []Node {
@@ -19,17 +20,24 @@ func NodesFromFiles(files []compose.File) []Node {
 	for _, file := range files {
 		for name, service := range file.Services {
 			nodes = append(nodes, Node{
-				name:         name,
-				category:     DeterminteCategory(name),
-				volumes:      service.Volumes,
-				dependencies: service.Dependencies,
+				name:                name,
+				category:            DeterminteCategory(name),
+				volumeMounts:        service.VolumeMounts,
+				serviceDependencies: service.ServiceDependencies,
+			})
+		}
+
+		for _, name := range file.Volumes {
+			nodes = append(nodes, Node{
+				name:     name,
+				category: CategoryVolume,
 			})
 		}
 	}
 
 	// sort the nodes to achieve a reproducible output
-	sort.Slice(nodes, func(i, j int) bool {
-		return nodes[i].name < nodes[j].name
+	slices.SortFunc(nodes, func(a, b Node) int {
+		return cmp.Compare(a.name, b.name)
 	})
 
 	return nodes

@@ -1,10 +1,12 @@
 package compose
 
 import (
+	"cmp"
 	"errors"
 	"fmt"
 	"io"
 	"os"
+	"slices"
 	"strings"
 
 	"github.com/goccy/go-yaml"
@@ -58,27 +60,27 @@ func Parse(r io.Reader) (File, error) {
 // helpers for parsing
 //
 
-// rawVolume supports both short & long 'volume' formats
-type rawVolume struct {
+// rawVolumeMount supports both short & long 'volume' formats
+type rawVolumeMount struct {
 	Short string
-	Long  *rawVolumeLong
+	Long  *rawVolumeMountLong
 }
 
-type rawVolumeLong struct {
+type rawVolumeMountLong struct {
 	Type     string `yaml:"type,omitempty"`
 	Source   string `yaml:"source,omitempty"`
 	Target   string `yaml:"target,omitempty"`
 	ReadOnly bool   `yaml:"read_only,omitempty"`
 }
 
-func (r *rawVolume) UnmarshalYAML(unmarshal func(any) error) error {
+func (r *rawVolumeMount) UnmarshalYAML(unmarshal func(any) error) error {
 	var short string
 	if err := unmarshal(&short); err == nil {
 		r.Short = short
 		return nil
 	}
 
-	var long rawVolumeLong
+	var long rawVolumeMountLong
 	if err := unmarshal(&long); err == nil {
 		r.Long = &long
 		return nil
@@ -115,8 +117,8 @@ func (d *rawDependsOn) UnmarshalYAML(unmarshal func(any) error) error {
 
 func (s *Service) UnmarshalYAML(unmarshal func(any) error) error {
 	var raw struct {
-		Volumes   []rawVolume  `yaml:"volumes,omitempty"`
-		DependsOn rawDependsOn `yaml:"depends_on,omitempty"`
+		VolumeMounts []rawVolumeMount `yaml:"volumes,omitempty"`
+		DependsOn    rawDependsOn     `yaml:"depends_on,omitempty"`
 	}
 	if err := unmarshal(&raw); err != nil {
 		return err
@@ -124,7 +126,7 @@ func (s *Service) UnmarshalYAML(unmarshal func(any) error) error {
 
 	// normalize depends_on
 	for _, dependency := range raw.DependsOn.List {
-		s.Dependencies = append(s.Dependencies, Dependency{
+		s.ServiceDependencies = append(s.ServiceDependencies, ServiceDependency{
 			On:        dependency,
 			Condition: ConditionServiceStarted, // default
 		})
@@ -135,14 +137,18 @@ func (s *Service) UnmarshalYAML(unmarshal func(any) error) error {
 		if err != nil {
 			return err
 		}
-		s.Dependencies = append(s.Dependencies, Dependency{
+		s.ServiceDependencies = append(s.ServiceDependencies, ServiceDependency{
 			On:        name,
 			Condition: c,
 		})
 	}
 
-	// normalize volumes
-	for _, volume := range raw.Volumes {
+	slices.SortFunc(s.ServiceDependencies, func(a, b ServiceDependency) int {
+		return cmp.Compare(a.On, b.On)
+	})
+
+	// normalize volume mounts
+	for _, volume := range raw.VolumeMounts {
 		switch {
 		case volume.Short != "":
 			parts := strings.Split(volume.Short, ":")
@@ -156,7 +162,7 @@ func (s *Service) UnmarshalYAML(unmarshal func(any) error) error {
 				t = VolumeTypeBind
 			}
 
-			s.Volumes = append(s.Volumes, Volume{
+			s.VolumeMounts = append(s.VolumeMounts, VolumeMount{
 				Type:     t,
 				Source:   parts[0],
 				Target:   parts[1],
@@ -164,11 +170,11 @@ func (s *Service) UnmarshalYAML(unmarshal func(any) error) error {
 			})
 
 		case volume.Long != nil:
-			t, err := parseVolumeType(volume.Long.Type)
+			t, err := parseVolumeMountType(volume.Long.Type)
 			if err != nil {
 				return err
 			}
-			s.Volumes = append(s.Volumes, Volume{
+			s.VolumeMounts = append(s.VolumeMounts, VolumeMount{
 				Type:     t,
 				Source:   volume.Long.Source,
 				Target:   volume.Long.Target,
@@ -176,6 +182,29 @@ func (s *Service) UnmarshalYAML(unmarshal func(any) error) error {
 			})
 		}
 	}
+
+	return nil
+}
+
+func (s *File) UnmarshalYAML(unmarshal func(any) error) error {
+	var raw struct {
+		Services map[string]Service `yaml:"services"`
+		Volumes  map[string]any     `yaml:"volumes,omitempty"`
+	}
+	if err := unmarshal(&raw); err != nil {
+		return err
+	}
+
+	volumes := make([]string, 0, len(raw.Volumes))
+
+	for volume := range raw.Volumes {
+		volumes = append(volumes, volume)
+	}
+
+	slices.Sort(volumes)
+
+	s.Services = raw.Services
+	s.Volumes = volumes
 
 	return nil
 }
