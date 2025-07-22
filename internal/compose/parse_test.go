@@ -17,7 +17,7 @@ services:
   service1:
     image: service1:latest
     labels:
-      - "dot.graph.type=database"
+      - "graph.category=database"
     volumes:
       - type:   bind
         source: /dir/from
@@ -28,7 +28,7 @@ services:
     depends_on:
       - service1
     labels:
-      dot.graph.type: proxy
+      graph.category: proxy
     volumes:
       - my-volume:/some/data:ro
 
@@ -49,6 +49,7 @@ volumes:
 	require.Len(t, parsed.Services, 3)
 	require.Len(t, parsed.Volumes, 1)
 
+	// service1
 	service1, ok := parsed.Services["service1"]
 	require.True(t, ok, "service1 missing from parsed result")
 	assert.Equal(
@@ -61,8 +62,9 @@ volumes:
 		}},
 		service1.VolumeMounts,
 	)
-	assert.Equal(t, map[string]string{"dot.graph.type": "database"}, service1.Labels)
+	assert.Equal(t, map[string]string{"graph.category": "database"}, service1.Labels)
 
+	// service2
 	service2, ok := parsed.Services["service2"]
 	require.True(t, ok, "service2 missing from parsed result")
 	assert.Equal(
@@ -83,8 +85,9 @@ volumes:
 		}},
 		service2.ServiceDependencies,
 	)
-	assert.Equal(t, map[string]string{"dot.graph.type": "proxy"}, service2.Labels)
+	assert.Equal(t, map[string]string{"graph.category": "proxy"}, service2.Labels)
 
+	// service3
 	service3, ok := parsed.Services["service3"]
 	require.True(t, ok, "service3 missing from parsed result")
 	assert.Equal(
@@ -106,5 +109,6 @@ volumes:
 		service3.ServiceDependencies,
 	)
 
+	// volumes
 	assert.Equal(t, []string{"my-volume"}, parsed.Volumes)
 }
