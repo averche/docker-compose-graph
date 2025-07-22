@@ -10,7 +10,7 @@ func TestDetermineCategory(t *testing.T) {
 	assert.Equal(t, CategoryCadence, DeterminteServiceCategory("my-cadence", ""))
 	assert.Equal(t, CategoryUserInterface, DeterminteServiceCategory("my-ui", ""))
 	assert.Equal(t, CategoryStorage, DeterminteServiceCategory("my-storage", ""))
-	assert.Equal(t, CategoryProxy, DeterminteServiceCategory("my-proxy", ""))
+	assert.Equal(t, CategoryTool, DeterminteServiceCategory("my-tool", ""))
 	assert.Equal(t, CategoryDatabase, DeterminteServiceCategory("my-postgres", ""))
 	assert.Equal(t, CategoryDatabase, DeterminteServiceCategory("my-database", ""))
 	assert.Equal(t, CategoryService, DeterminteServiceCategory("something", ""))

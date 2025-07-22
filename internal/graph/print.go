@@ -113,7 +113,7 @@ func printDependencies(w io.Writer, name string, serviceDependencies []compose.S
 		if v.ReadOnly {
 			fmt.Fprintf(w, `  %-36s -> %-36s [style="dashed"];`+"\n", sanitize(name), sanitize(v.Source))
 		} else {
-			fmt.Fprintf(w, `  %-36s -> %-36s [style="bold"];`+"\n", sanitize(name), sanitize(v.Source))
+			fmt.Fprintf(w, `  %-36s -> %-36s [style="bold,dashed"];`+"\n", sanitize(name), sanitize(v.Source))
 		}
 	}
 }

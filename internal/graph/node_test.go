@@ -16,7 +16,7 @@ func TestOrderedPresentCategories(t *testing.T) {
 	}, {
 		Name: "docker-compose-2.yaml",
 		Nodes: []Node{
-			{Name: "my-proxy", Category: CategoryProxy},
+			{Name: "my-proxy", Category: CategoryTool},
 			{Name: "my-storage", Category: CategoryStorage},
 			{Name: "my-service2", Category: CategoryService},
 		},
@@ -24,7 +24,7 @@ func TestOrderedPresentCategories(t *testing.T) {
 
 	assert.Equal(t, []Category{
 		CategoryService,
-		CategoryProxy,
+		CategoryTool,
 		CategoryDatabase,
 		CategoryStorage,
 	}, orderedPresentCategories(groups))
