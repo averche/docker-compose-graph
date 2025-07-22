@@ -28,8 +28,8 @@ const (
 	Box      Shape = "box"
 	Diamond  Shape = "diamond"
 	Cylinder Shape = "cylinder"
-	Hexagon  Shape = "hexagon"
-	Record   Shape = "record"
+	Note     Shape = "note"
+	Octagon  Shape = "octagon"
 )
 
 type Style string

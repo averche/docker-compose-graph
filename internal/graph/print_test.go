@@ -13,7 +13,7 @@ func TestPrintNode(t *testing.T) {
 
 	printNode(&b1, "my-service", CategoryService, true)
 	printNode(&b2, "cadence-service", CategoryCadence, false)
-	printNode(&b3, "my-proxy", CategoryProxy, true)
+	printNode(&b3, "my-tool", CategoryTool, true)
 
 	assert.Equal(
 		t,
@@ -22,12 +22,12 @@ func TestPrintNode(t *testing.T) {
 	)
 	assert.Equal(
 		t,
-		`    cadence_service                    [shape = "box"        style = "rounded,bold,filled"    fillcolor = "/brbg8/7"   color = "/brbg8/8"   fontcolor = "white"      label = "cadence-service"];`+"\n",
+		`    cadence_service                    [shape = "box"        style = "rounded,bold,filled"    fillcolor = "/orrd8/7"   color = "/orrd8/8"   fontcolor = "white"      label = "cadence-service"];`+"\n",
 		b2.String(),
 	)
 	assert.Equal(
 		t,
-		`    my_proxy                           [shape = "diamond"    style = "rounded,bold,filled"    fillcolor = "/bupu8/7"   color = "/bupu8/8"   fontcolor = "white"      fontsize = "8pt"  label = "my-proxy"];`+"\n",
+		`    my_tool                            [shape = "octagon"    style = "rounded,bold,filled"    fillcolor = "/bugn8/7"   color = "/bugn8/8"   fontcolor = "white"      fontsize = "8pt"  label = "my-tool"];`+"\n",
 		b3.String(),
 	)
 }

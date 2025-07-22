@@ -13,7 +13,7 @@ const (
 	CategoryVault
 	CategoryCadence
 	CategoryUserInterface
-	CategoryProxy
+	CategoryTool
 	CategoryDatabase
 	CategoryStorage
 	CategoryScript
@@ -41,13 +41,13 @@ var categoryStrings = []string{
 var categoryDecorations = map[Category]Decorations{
 	CategoryNone:          {styles: []Style{Rounded, Bold, Filled}, shape: Box, palette: Palette{Blue, DarkBlue, White}},
 	CategoryService:       {styles: []Style{Rounded, Bold, Filled}, shape: Box, palette: Palette{Blue, DarkBlue, White}},
-	CategoryVault:         {styles: []Style{Rounded, Bold, Filled}, shape: Record, palette: Palette{Teal, DarkTeal, White}},
-	CategoryCadence:       {styles: []Style{Rounded, Bold, Filled}, shape: Box, palette: Palette{Teal, DarkTeal, White}},
-	CategoryUserInterface: {styles: []Style{Rounded, Bold, Filled}, shape: Record, palette: Palette{Teal, DarkTeal, White}},
-	CategoryProxy:         {styles: []Style{Rounded, Bold, Filled}, shape: Diamond, palette: Palette{Purple, DarkPurple, White}},
+	CategoryVault:         {styles: []Style{Rounded, Bold, Filled}, shape: Octagon, palette: Palette{Teal, DarkTeal, White}},
+	CategoryCadence:       {styles: []Style{Rounded, Bold, Filled}, shape: Box, palette: Palette{Red, DarkRed, White}},
+	CategoryUserInterface: {styles: []Style{Rounded, Bold, Filled}, shape: Box, palette: Palette{Purple, DarkPurple, White}},
+	CategoryTool:          {styles: []Style{Rounded, Bold, Filled}, shape: Octagon, palette: Palette{Green, DarkGreen, White}},
 	CategoryDatabase:      {styles: []Style{Rounded, Bold, Filled}, shape: Cylinder, palette: Palette{Green, DarkGreen, White}},
 	CategoryStorage:       {styles: []Style{Rounded, Bold, Filled}, shape: Cylinder, palette: Palette{Red, DarkRed, White}},
-	CategoryScript:        {styles: []Style{Rounded, Bold, Filled}, shape: Hexagon, palette: Palette{Grey, DarkGrey, White}},
+	CategoryScript:        {styles: []Style{Bold, Filled}, shape: Note, palette: Palette{Grey, DarkGrey, White}},
 	CategoryVolume:        {styles: []Style{Rounded, Bold, Filled}, shape: Cylinder, palette: Palette{Grey, DarkGrey, White}},
 }
 
@@ -63,11 +63,11 @@ var patterns = []struct {
 	category: CategoryScript,
 	pattern:  regexp.MustCompile(`(?i)^.*(script)$`),
 }, {
-	category: CategoryProxy,
-	pattern:  regexp.MustCompile(`(?i)^.*(proxy)$`),
+	category: CategoryTool,
+	pattern:  regexp.MustCompile(`(?i)^.*(tool)$`),
 }, {
 	category: CategoryStorage,
-	pattern:  regexp.MustCompile(`(?i)^.*(s3|storage)`),
+	pattern:  regexp.MustCompile(`(?i)^.*(storage)`),
 }, {
 	category: CategoryDatabase,
 	pattern:  regexp.MustCompile(`(?i)^.*(database|postgres)`),
