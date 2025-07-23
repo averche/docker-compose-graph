@@ -36,13 +36,13 @@ func Print(w io.Writer, groups []NodeGroup) {
 
 func printGroups(w io.Writer, group NodeGroup, subgraphIndex uint32) {
 	fmt.Fprintf(w, "  subgraph cluster_%d {\n", subgraphIndex)
-	fmt.Fprintf(w, "      label = %q\n", group.Name)
+	fmt.Fprintf(w, "      label = %q\n", group.Label)
 	fmt.Fprintf(w, "      shape = %q\n", Box)
 	fmt.Fprintf(w, "      style = %q\n", JoinStyles([]Style{Rounded, Bold, Dashed}, ","))
 	fmt.Fprintf(w, "      color = %q\n", DarkGrey)
 
 	for _, node := range group.Nodes {
-		printNode(w, node.Name, node.Category, false)
+		printNode(w, node.Name, node.Label, node.Category, false)
 	}
 
 	fmt.Fprintf(w, "  }\n")
@@ -58,14 +58,14 @@ func printLegend(w io.Writer, groups []NodeGroup, subgraphIndex uint32) {
 
 	// ordered list of categories to achieve a reproducible output
 	for _, category := range orderedPresentCategories(groups) {
-		printNode(w, category.String(), category, true)
+		printNode(w, category.String(), category.String(), category, true)
 	}
 
 	fmt.Fprintf(w, "  }\n")
 }
 
 // printNode prints a dot-graph formatted string in the form 'name [style decorators];'
-func printNode(w io.Writer, name string, category Category, small bool) {
+func printNode(w io.Writer, name string, label string, category Category, small bool) {
 	d, ok := categoryDecorations[category]
 	if !ok {
 		panic(fmt.Sprintf("decorations missing for '%s' category", category))
@@ -87,7 +87,7 @@ func printNode(w io.Writer, name string, category Category, small bool) {
 		d.palette.ColorFill,
 		d.palette.ColorBorder,
 		d.palette.ColorFont,
-		name,
+		label,
 	)
 }
 

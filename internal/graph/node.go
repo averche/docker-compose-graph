@@ -8,17 +8,18 @@ import (
 )
 
 const (
-	labelCategory = "graph.node.category"
-	labelLabel    = "graph.node.label"
+	graphNodeCategory = "graph.node.category"
+	graphNodeLabel    = "graph.node.label"
 )
 
 type NodeGroup struct {
-	Name  string
+	Label string
 	Nodes []Node
 }
 
 type Node struct {
 	Name                string
+	Label               string
 	Category            Category
 	VolumeMounts        []compose.VolumeMount
 	ServiceDependencies []compose.ServiceDependency
@@ -37,14 +38,15 @@ func NodesFromFile(file compose.File) []Node {
 			}
 		}
 
-		label, ok := service.Labels[labelLabel]
+		label, ok := service.Labels[graphNodeLabel]
 		if !ok {
 			label = name
 		}
 
 		nodes = append(nodes, Node{
-			Name:                label,
-			Category:            DeterminteServiceCategory(name, service.Labels[labelCategory]),
+			Name:                name,
+			Label:               label,
+			Category:            DeterminteServiceCategory(name, service.Labels[graphNodeCategory]),
 			VolumeMounts:        volumeMounts,
 			ServiceDependencies: service.ServiceDependencies,
 		})
