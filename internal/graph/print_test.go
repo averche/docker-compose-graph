@@ -17,17 +17,17 @@ func TestPrintNode(t *testing.T) {
 
 	assert.Equal(
 		t,
-		`    my_service                         [shape = "box"        style = "rounded,bold,filled"    fillcolor = "/blues8/7"  color = "/blues8/8"  fontcolor = "white"      fontsize = "8pt"  label = "my-service"];`+"\n",
+		`    my_service                           [shape = "box"        style = "rounded,bold,filled"    fillcolor = "/blues8/7"  color = "/blues8/8"  fontcolor = "white"      fontsize = "8pt"  label = "my-service"];`+"\n",
 		b1.String(),
 	)
 	assert.Equal(
 		t,
-		`    cadence_service                    [shape = "box"        style = "rounded,bold,filled"    fillcolor = "/orrd8/7"   color = "/orrd8/8"   fontcolor = "white"      label = "cadence-service"];`+"\n",
+		`    cadence_service                      [shape = "box"        style = "rounded,bold,filled"    fillcolor = "/orrd8/7"   color = "/orrd8/8"   fontcolor = "white"      label = "cadence-service"];`+"\n",
 		b2.String(),
 	)
 	assert.Equal(
 		t,
-		`    my_tool                            [shape = "octagon"    style = "rounded,bold,filled"    fillcolor = "/bugn8/7"   color = "/bugn8/8"   fontcolor = "white"      fontsize = "8pt"  label = "my-tool"];`+"\n",
+		`    my_tool                              [shape = "octagon"    style = "rounded,bold,filled"    fillcolor = "/bugn8/7"   color = "/bugn8/8"   fontcolor = "white"      fontsize = "8pt"  label = "my-tool"];`+"\n",
 		b3.String(),
 	)
 }
@@ -61,11 +61,11 @@ func TestPrintDependencies(t *testing.T) {
 
 	assert.Contains(
 		t, `
-  my_service                           -> test_service_2                       [style="dashed"];
-  my_service                           -> test_service_1                       [arrowhead="diamond" style="bold"];
-  my_service                           -> test_service_3                       [arrowhead="diamond" style="bold"];
-  my_service                           -> test_service_0                       [style="bold"];
-  my_service                           -> my_volume                            [style="dashed"];
+  my_service                             -> test_service_2                         [style="dashed"];
+  my_service                             -> test_service_1                         [arrowhead="diamond" style="bold"];
+  my_service                             -> test_service_3                         [arrowhead="diamond" style="bold"];
+  my_service                             -> test_service_0                         [style="bold"];
+  my_service                             -> my_volume                              [style="dashed"];
 `,
 		b.String(),
 	)
