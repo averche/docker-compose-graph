@@ -17,7 +17,7 @@ services:
   service1:
     image: service1:latest
     labels:
-      - "graph.category=database"
+      - "graph.node.category=database"
     volumes:
       - type:   bind
         source: /dir/from
@@ -28,7 +28,7 @@ services:
     depends_on:
       - service1
     labels:
-      graph.category: proxy
+      graph.node.category: tool
     volumes:
       - my-volume:/some/data:ro
 
@@ -62,7 +62,7 @@ volumes:
 		}},
 		service1.VolumeMounts,
 	)
-	assert.Equal(t, map[string]string{"graph.category": "database"}, service1.Labels)
+	assert.Equal(t, map[string]string{"graph.node.category": "database"}, service1.Labels)
 
 	// service2
 	service2, ok := parsed.Services["service2"]
@@ -85,7 +85,7 @@ volumes:
 		}},
 		service2.ServiceDependencies,
 	)
-	assert.Equal(t, map[string]string{"graph.category": "proxy"}, service2.Labels)
+	assert.Equal(t, map[string]string{"graph.node.category": "tool"}, service2.Labels)
 
 	// service3
 	service3, ok := parsed.Services["service3"]
