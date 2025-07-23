@@ -55,6 +55,7 @@ func NodesFromFile(file compose.File) []Node {
 	for _, name := range file.Volumes {
 		nodes = append(nodes, Node{
 			Name:     name,
+			Label:    name,
 			Category: CategoryVolume,
 		})
 	}
