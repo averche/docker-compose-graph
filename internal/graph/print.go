@@ -73,9 +73,9 @@ func printNode(w io.Writer, name string, category Category, small bool) {
 
 	var format string
 	if small {
-		format = `    %-34s [shape = %-12q style = %-24q fillcolor = %-12q color = %-12q fontcolor = %-12q fontsize = "8pt"  label = %q];` + "\n"
+		format = `    %-36s [shape = %-12q style = %-24q fillcolor = %-12q color = %-12q fontcolor = %-12q fontsize = "8pt"  label = %q];` + "\n"
 	} else {
-		format = `    %-34s [shape = %-12q style = %-24q fillcolor = %-12q color = %-12q fontcolor = %-12q label = %q];` + "\n"
+		format = `    %-36s [shape = %-12q style = %-24q fillcolor = %-12q color = %-12q fontcolor = %-12q label = %q];` + "\n"
 	}
 
 	fmt.Fprintf(
@@ -96,13 +96,13 @@ func printDependencies(w io.Writer, name string, serviceDependencies []compose.S
 	for _, dependency := range serviceDependencies {
 		switch dependency.Condition {
 		case compose.ConditionServiceHealthy:
-			fmt.Fprintf(w, `  %-36s -> %-36s [arrowhead="diamond" style="bold"];`+"\n", sanitize(name), sanitize(dependency.On))
+			fmt.Fprintf(w, `  %-38s -> %-38s [arrowhead="diamond" style="bold"];`+"\n", sanitize(name), sanitize(dependency.On))
 
 		case compose.ConditionServiceCompletedSuccessfully:
-			fmt.Fprintf(w, `  %-36s -> %-36s [style="bold"];`+"\n", sanitize(name), sanitize(dependency.On))
+			fmt.Fprintf(w, `  %-38s -> %-38s [style="bold"];`+"\n", sanitize(name), sanitize(dependency.On))
 
 		case compose.ConditionServiceStarted:
-			fmt.Fprintf(w, `  %-36s -> %-36s [style="dashed"];`+"\n", sanitize(name), sanitize(dependency.On))
+			fmt.Fprintf(w, `  %-38s -> %-38s [style="dashed"];`+"\n", sanitize(name), sanitize(dependency.On))
 
 		default:
 			panic(fmt.Sprintf("unexpected dependency condition %q", dependency.Condition))
@@ -111,9 +111,9 @@ func printDependencies(w io.Writer, name string, serviceDependencies []compose.S
 
 	for _, v := range volumeMounts {
 		if v.ReadOnly {
-			fmt.Fprintf(w, `  %-36s -> %-36s [style="dashed"];`+"\n", sanitize(name), sanitize(v.Source))
+			fmt.Fprintf(w, `  %-38s -> %-38s [style="dashed"];`+"\n", sanitize(name), sanitize(v.Source))
 		} else {
-			fmt.Fprintf(w, `  %-36s -> %-36s [style="bold,dashed"];`+"\n", sanitize(name), sanitize(v.Source))
+			fmt.Fprintf(w, `  %-38s -> %-38s [style="bold,dashed"];`+"\n", sanitize(name), sanitize(v.Source))
 		}
 	}
 }
