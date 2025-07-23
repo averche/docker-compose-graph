@@ -21,7 +21,7 @@ func main() {
 		}
 
 		groups = append(groups, graph.NodeGroup{
-			Name:  filepath.Base(path),
+			Label: filepath.Base(path),
 			Nodes: graph.NodesFromFile(f),
 		})
 	}

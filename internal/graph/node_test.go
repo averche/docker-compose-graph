@@ -8,13 +8,13 @@ import (
 
 func TestOrderedPresentCategories(t *testing.T) {
 	groups := []NodeGroup{{
-		Name: "docker-compose-1.yaml",
+		Label: "docker-compose-1.yaml",
 		Nodes: []Node{
 			{Name: "my-service1", Category: CategoryService},
 			{Name: "my-database", Category: CategoryDatabase},
 		},
 	}, {
-		Name: "docker-compose-2.yaml",
+		Label: "docker-compose-2.yaml",
 		Nodes: []Node{
 			{Name: "my-proxy", Category: CategoryTool},
 			{Name: "my-storage", Category: CategoryStorage},
