@@ -7,7 +7,10 @@ import (
 	"github.com/averche/docker-compose-graph/internal/compose"
 )
 
-const categoryLabel = "graph.category"
+const (
+	labelCategory = "graph.node.category"
+	labelLabel    = "graph.node.label"
+)
 
 type NodeGroup struct {
 	Name  string
@@ -34,9 +37,14 @@ func NodesFromFile(file compose.File) []Node {
 			}
 		}
 
+		label, ok := service.Labels[labelLabel]
+		if !ok {
+			label = name
+		}
+
 		nodes = append(nodes, Node{
-			Name:                name,
-			Category:            DeterminteServiceCategory(name, service.Labels[categoryLabel]),
+			Name:                label,
+			Category:            DeterminteServiceCategory(name, service.Labels[labelCategory]),
 			VolumeMounts:        volumeMounts,
 			ServiceDependencies: service.ServiceDependencies,
 		})
