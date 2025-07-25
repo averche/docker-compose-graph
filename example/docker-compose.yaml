@@ -1,0 +1,30 @@
+version: "3.9"
+
+services:
+  my-database:
+    image: postgres:17
+    environment:
+      POSTGRES_USER: user
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: database
+    healthcheck:
+      test: pg_isready
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    ports:
+      - "5432:5432"
+    volumes:
+      - database_data:/var/lib/postgresql/data
+
+  my-service:
+    image: nginx:latest
+    depends_on:
+      my-database:
+        condition: service_healthy
+    ports:
+      - "8080:80"
+
+volumes:
+  database_data:
+
