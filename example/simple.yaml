@@ -1,6 +1,7 @@
 version: "3.9"
 
 services:
+
   my-database:
     image: postgres:17
     environment:
@@ -13,9 +14,9 @@ services:
       timeout: 5s
       retries: 5
     ports:
-      - "5432:5432"
+      - 5432:5432
     volumes:
-      - database_data:/var/lib/postgresql/data
+      - my-volume:/var/lib/postgresql/data
 
   my-service:
     image: nginx:latest
@@ -23,8 +24,10 @@ services:
       my-database:
         condition: service_healthy
     ports:
-      - "8080:80"
+      - 8080:80
+    volumes:
+      - my-volume:/tmp:ro
 
 volumes:
-  database_data:
+  my-volume:
 
