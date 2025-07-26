@@ -9,7 +9,10 @@ type Category uint8
 
 const (
 	CategoryNone Category = iota
-	CategoryService
+	CategoryService1
+	CategoryService2
+	CategoryService3
+	CategoryService4
 	CategoryVault
 	CategoryCadence
 	CategoryUserInterface
@@ -27,7 +30,10 @@ const (
 
 var categoryStrings = []string{
 	"none",
-	"service",
+	"service1",
+	"service2",
+	"service3",
+	"service4",
 	"vault",
 	"cadence",
 	"ui",
@@ -40,11 +46,14 @@ var categoryStrings = []string{
 
 var categoryDecorations = map[Category]Decorations{
 	CategoryNone:          {styles: []Style{Rounded, Bold, Filled}, shape: Box, palette: Palette{Blue, DarkBlue, White}},
-	CategoryService:       {styles: []Style{Rounded, Bold, Filled}, shape: Box, palette: Palette{Blue, DarkBlue, White}},
+	CategoryService1:      {styles: []Style{Rounded, Bold, Filled}, shape: Box, palette: Palette{Blue, DarkBlue, White}},
+	CategoryService2:      {styles: []Style{Rounded, Bold, Filled}, shape: Box, palette: Palette{Teal, DarkTeal, White}},
+	CategoryService3:      {styles: []Style{Rounded, Bold, Filled}, shape: Box, palette: Palette{Green, DarkGreen, White}},
+	CategoryService4:      {styles: []Style{Rounded, Bold, Filled}, shape: Box, palette: Palette{Red, DarkRed, White}},
 	CategoryVault:         {styles: []Style{Rounded, Bold, Filled}, shape: Octagon, palette: Palette{Teal, DarkTeal, White}},
 	CategoryCadence:       {styles: []Style{Rounded, Bold, Filled}, shape: Box, palette: Palette{Red, DarkRed, White}},
 	CategoryUserInterface: {styles: []Style{Rounded, Bold, Filled}, shape: Box, palette: Palette{Purple, DarkPurple, White}},
-	CategoryTool:          {styles: []Style{Rounded, Bold, Filled}, shape: Octagon, palette: Palette{Green, DarkGreen, White}},
+	CategoryTool:          {styles: []Style{Rounded, Bold, Filled}, shape: Octagon, palette: Palette{Blue, DarkBlue, White}},
 	CategoryDatabase:      {styles: []Style{Rounded, Bold, Filled}, shape: Cylinder, palette: Palette{Green, DarkGreen, White}},
 	CategoryStorage:       {styles: []Style{Rounded, Bold, Filled}, shape: Cylinder, palette: Palette{Red, DarkRed, White}},
 	CategoryScript:        {styles: []Style{Bold, Filled}, shape: Note, palette: Palette{Grey, DarkGrey, White}},
@@ -55,8 +64,8 @@ func (d Category) String() string {
 	return categoryStrings[d]
 }
 
-// patterns are evaluated sequentially
-var patterns = []struct {
+// guessPatterns are evaluated sequentially to guess the service category
+var guessPatterns = []struct {
 	category Category
 	pattern  *regexp.Regexp
 }{{
@@ -91,12 +100,12 @@ func DeterminteServiceCategory(service, label string) Category {
 		}
 	}
 
-	// test for each category in sequence
-	for _, p := range patterns {
+	// otherwise, test for each category in sequence of guess patterns
+	for _, p := range guessPatterns {
 		if p.pattern.MatchString(service) {
 			return p.category
 		}
 	}
 
-	return CategoryService // default
+	return CategoryService1 // default
 }

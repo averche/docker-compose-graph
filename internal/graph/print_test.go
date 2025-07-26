@@ -11,7 +11,7 @@ import (
 func TestPrintNode(t *testing.T) {
 	var b1, b2, b3 strings.Builder
 
-	printNode(&b1, "my-service", "my-service", CategoryService, true)
+	printNode(&b1, "my-service", "my-service", CategoryService1, true)
 	printNode(&b2, "cadence-service", "cadence", CategoryCadence, false)
 	printNode(&b3, "my-tool", "tool1", CategoryTool, true)
 
@@ -27,7 +27,7 @@ func TestPrintNode(t *testing.T) {
 	)
 	assert.Equal(
 		t,
-		`    my_tool                              [shape = "octagon"    style = "rounded,bold,filled"    fillcolor = "/bugn8/7"   color = "/bugn8/8"   fontcolor = "white"      fontsize = "8pt"  label = "tool1"];`+"\n",
+		`    my_tool                              [shape = "octagon"    style = "rounded,bold,filled"    fillcolor = "/blues8/7"  color = "/blues8/8"  fontcolor = "white"      fontsize = "8pt"  label = "tool1"];`+"\n",
 		b3.String(),
 	)
 }
@@ -62,8 +62,8 @@ func TestPrintDependencies(t *testing.T) {
 	assert.Contains(
 		t, `
   my_service                             -> test_service_2                         [style="dashed"];
-  my_service                             -> test_service_1                         [arrowhead="diamond" style="bold"];
-  my_service                             -> test_service_3                         [arrowhead="diamond" style="bold"];
+  my_service                             -> test_service_1                         [style="bold" arrowhead="diamond"];
+  my_service                             -> test_service_3                         [style="bold" arrowhead="diamond"];
   my_service                             -> test_service_0                         [style="bold"];
   my_service                             -> my_volume                              [style="dashed"];
 `,
