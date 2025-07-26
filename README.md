@@ -1,16 +1,16 @@
-# docker-compose-graph
+# simple-graph
 
 ## Example
 
 ```sh
-❯ go run main.go example/docker-compose.yaml
+❯ go run main.go example/simple.yaml
 
 digraph compose {
   graph [fontname = "arial"];
   node  [fontname = "arial"];
   edge  [fontname = "arial" color = "/greys8/8"];
   subgraph cluster_0 {
-      label = "docker-compose.yaml"
+      label = "simple.yaml"
       shape = "box"
       style = "rounded,bold,dashed"
       color = "/greys8/8"
@@ -35,8 +35,8 @@ digraph compose {
 To generate an image, pipe the output to `dot`:
 
 ```sh
-❯ go run main.go example/docker-compose.yaml | dot -Tsvg > example/docker-compose.svg
+❯ go run main.go example/simple.yaml | dot -Tsvg > example/simple.svg
 
 ```
 
-![example](./example/docker-compose.svg)
+![example](./example/simple.svg)
