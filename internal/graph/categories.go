@@ -13,6 +13,8 @@ const (
 	CategoryService2
 	CategoryService3
 	CategoryService4
+	CategoryVault
+	CategoryCadence
 	CategoryUserInterface
 	CategoryTool
 	CategoryDatabase
@@ -32,6 +34,8 @@ var categoryStrings = []string{
 	"service2",
 	"service3",
 	"service4",
+	"vault",
+	"cadence",
 	"ui",
 	"tool",
 	"database",
@@ -46,8 +50,10 @@ var categoryDecorations = map[Category]Decorations{
 	CategoryService2:      {styles: []Style{Rounded, Bold, Filled}, shape: Box, palette: Palette{Teal, DarkTeal, White}},
 	CategoryService3:      {styles: []Style{Rounded, Bold, Filled}, shape: Box, palette: Palette{Green, DarkGreen, White}},
 	CategoryService4:      {styles: []Style{Rounded, Bold, Filled}, shape: Box, palette: Palette{Red, DarkRed, White}},
+	CategoryVault:         {styles: []Style{Rounded, Bold, Filled}, shape: Octagon, palette: Palette{Teal, DarkTeal, White}},
+	CategoryCadence:       {styles: []Style{Rounded, Bold, Filled}, shape: Box, palette: Palette{Red, DarkRed, White}},
 	CategoryUserInterface: {styles: []Style{Rounded, Bold, Filled}, shape: Box, palette: Palette{Purple, DarkPurple, White}},
-	CategoryTool:          {styles: []Style{Rounded, Bold, Filled}, shape: Octagon, palette: Palette{Teal, DarkTeal, White}},
+	CategoryTool:          {styles: []Style{Rounded, Bold, Filled}, shape: Octagon, palette: Palette{Blue, DarkBlue, White}},
 	CategoryDatabase:      {styles: []Style{Rounded, Bold, Filled}, shape: Cylinder, palette: Palette{Green, DarkGreen, White}},
 	CategoryStorage:       {styles: []Style{Rounded, Bold, Filled}, shape: Cylinder, palette: Palette{Red, DarkRed, White}},
 	CategoryScript:        {styles: []Style{Bold, Filled}, shape: Note, palette: Palette{Grey, DarkGrey, White}},
@@ -77,6 +83,12 @@ var guessPatterns = []struct {
 }, {
 	category: CategoryUserInterface,
 	pattern:  regexp.MustCompile(`(?i)^.*(ui)`),
+}, {
+	category: CategoryCadence,
+	pattern:  regexp.MustCompile(`(?i)^.*(cadence|temporal)`),
+}, {
+	category: CategoryVault,
+	pattern:  regexp.MustCompile(`(?i)^.*(vault)`),
 }}
 
 // DetermineCategory tries to guess the category based on the service name & label (if provided)
