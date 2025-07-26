@@ -11,8 +11,8 @@ import (
 func TestPrintNode(t *testing.T) {
 	var b1, b2, b3 strings.Builder
 
-	printNode(&b1, "my-service", "my-service", CategoryService, true)
-	printNode(&b2, "cadence-service", "cadence", CategoryCadence, false)
+	printNode(&b1, "my-service", "my-service", CategoryService1, true)
+	printNode(&b2, "cadence-service", "cadence", CategoryService3, false)
 	printNode(&b3, "my-tool", "tool1", CategoryTool, true)
 
 	assert.Equal(
