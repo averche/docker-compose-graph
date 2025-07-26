@@ -1,6 +1,9 @@
-# simple-graph
+# docker-compose-graph
 
-## examples
+A simple command-line tool that constructs a [DOT][1] graph of service and
+volume dependencies within a given set of [docker-compose][2] files.
+
+## Usage example
 
 ```sh
 ❯ go run main.go examples/simple.yaml
@@ -40,4 +43,7 @@ To generate an image, pipe the output to `dot`:
 
 ```
 
-![examples](./examples/simple.svg)
+![example](./examples/simple.svg)
+
+[1]: https://en.wikipedia.org/wiki/DOT_%28graph_description_language%29
+[2]: https://docs.docker.com/compose/
