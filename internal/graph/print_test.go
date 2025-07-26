@@ -12,7 +12,7 @@ func TestPrintNode(t *testing.T) {
 	var b1, b2, b3 strings.Builder
 
 	printNode(&b1, "my-service", "my-service", CategoryService1, true)
-	printNode(&b2, "cadence-service", "cadence", CategoryService3, false)
+	printNode(&b2, "cadence-service", "cadence", CategoryService4, false)
 	printNode(&b3, "my-tool", "tool1", CategoryTool, true)
 
 	assert.Equal(
@@ -27,7 +27,7 @@ func TestPrintNode(t *testing.T) {
 	)
 	assert.Equal(
 		t,
-		`    my_tool                              [shape = "octagon"    style = "rounded,bold,filled"    fillcolor = "/bugn8/7"   color = "/bugn8/8"   fontcolor = "white"      fontsize = "8pt"  label = "tool1"];`+"\n",
+		`    my_tool                              [shape = "octagon"    style = "rounded,bold,filled"    fillcolor = "/brbg8/7"   color = "/brbg8/8"   fontcolor = "white"      fontsize = "8pt"  label = "tool1"];`+"\n",
 		b3.String(),
 	)
 }
