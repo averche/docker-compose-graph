@@ -1,9 +1,9 @@
 # simple-graph
 
-## Example
+## examples
 
 ```sh
-❯ go run main.go example/simple.yaml
+❯ go run main.go examples/simple.yaml
 
 digraph compose {
   graph [fontname = "arial"];
@@ -36,8 +36,8 @@ digraph compose {
 To generate an image, pipe the output to `dot`:
 
 ```sh
-❯ go run main.go example/simple.yaml | dot -Tsvg > example/simple.svg
+❯ go run main.go examples/simple.yaml | dot -Tsvg > examples/simple.svg
 
 ```
 
-![example](./example/simple.svg)
+![examples](./examples/simple.svg)

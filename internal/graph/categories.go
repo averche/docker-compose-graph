@@ -31,7 +31,7 @@ var categoryStrings = []string{
 	"vault",
 	"cadence",
 	"ui",
-	"proxy",
+	"tool",
 	"database",
 	"storage",
 	"script",
