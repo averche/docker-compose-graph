@@ -1,0 +1,50 @@
+version: "3.9"
+
+services:
+
+  my-database:
+    image: postgres:17
+    environment:
+      POSTGRES_USER: user
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: database
+    healthcheck:
+      test: pg_isready
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    ports:
+      - 5432:5432
+    volumes:
+      - my-volume:/var/lib/postgresql/data
+
+  my-service:
+    image: nginx:latest
+    depends_on:
+      my-database:
+        condition: service_healthy
+    ports:
+      - 8080:80
+    volumes:
+      - my-volume:/tmp:ro
+
+  my-service-requestor:
+    image: curlimages/curl:latest
+    labels:
+      graph.node.label: my-service-ui
+      graph.node.category: ui
+    depends_on:
+      my-service:
+        condition: service_started
+  
+  my-service-init:
+    image: curlimages/curl:latest
+    labels:
+      graph.node.category: script
+    depends_on:
+      my-service:
+        condition: service_started
+
+volumes:
+  my-volume:
+
